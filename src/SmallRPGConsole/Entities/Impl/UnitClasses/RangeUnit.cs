@@ -1,4 +1,5 @@
 ﻿using System;
+using SmallRPG.Attributes;
 using SmallRPG.Entities.Interface;
 using SmallRPG.Enums;
 
@@ -14,14 +15,14 @@ namespace SmallRPG.Entities.Impl.UnitClasses
                 switch (UnitRace)
                 {
                     case Race.Elf:
-                        damage = 6;
+                        damage = 5;
                         break;
                     case Race.Human:
-                        damage = 5;
+                        damage = 4;
                         break;
                     case Race.Undead:
                     case Race.Orc:
-                        damage = 4;
+                        damage = 3;
                         break;
                 }
                 return damage * DamageMultiplier;
@@ -32,7 +33,7 @@ namespace SmallRPG.Entities.Impl.UnitClasses
         {
             get
             {
-                var damage = 3;
+                var damage = 4;
                 switch (UnitRace)
                 {
                     case Race.Elf:
@@ -75,25 +76,13 @@ namespace SmallRPG.Entities.Impl.UnitClasses
         {
         }
 
-        public override void Combat(IUnit unit)
-        {
-            var random = new Random();
-            var next = random.Next(0, 100);
-            if (next > 60)
-            {
-                MeleeAttack(unit);
-            }
-            else
-            {
-                RangeAttack(unit);
-            }
-        }
-
+        [UnitAction(UnitActionType.Attack)]
         private void MeleeAttack(IUnit target)
         {
             target.TakeDamage(Damage, this, "sword");
         }
 
+        [UnitAction(UnitActionType.Attack)]
         private void RangeAttack(IUnit target)
         {
             target.TakeDamage(RangeDamage, this, "bow");

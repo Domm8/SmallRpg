@@ -3,8 +3,8 @@
     public interface IFighter
     {
         bool IsAlive { get; }
-        bool IsImproved { get; }
-        bool IsDiseased { get; }
+        bool IsHelpfull();
         void FightWith(IUnit unit);
+        void HelpTo(IUnit unit);
     }
 }

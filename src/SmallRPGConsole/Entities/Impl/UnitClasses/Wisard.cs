@@ -1,4 +1,5 @@
-﻿using SmallRPG.Entities.Interface;
+﻿using SmallRPG.Attributes;
+using SmallRPG.Entities.Interface;
 using SmallRPG.Enums;
 using System;
 
@@ -33,26 +34,16 @@ namespace SmallRPG.Entities.Impl.UnitClasses
             }
         }
 
+        [UnitAction(UnitActionType.Help)]
         public void ImproveUnit(IUnit unit)
         {
             unit.BecomeImproved(this);
         }
 
+        [UnitAction(UnitActionType.Attack)]
         public void MagicAttack(IUnit unit)
         {
             unit.TakeDamage(Damage, this, "magic");
-        }
-
-        public override void Combat(IUnit unit)
-        {
-            if (unit.IsFrendlyUnit(this))
-            {
-                ImproveUnit(unit);
-            }
-            else
-            {
-                MagicAttack(unit);
-            }
         }
     }
 }

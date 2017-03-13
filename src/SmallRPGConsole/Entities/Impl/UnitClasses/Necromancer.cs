@@ -1,6 +1,8 @@
-﻿using SmallRPG.Entities.Interface;
+﻿using SmallRPG.Attributes;
+using SmallRPG.Entities.Interface;
 using SmallRPG.Enums;
 using System;
+using SmallRPG.Services;
 
 namespace SmallRPG.Entities.Impl.UnitClasses
 {
@@ -22,25 +24,13 @@ namespace SmallRPG.Entities.Impl.UnitClasses
             }
         }
 
-        public override void Combat(IUnit unit)
-        {
-            var random = new Random();
-            var next = random.Next(0, 100);
-            if (next > 49)
-            {
-                MagicAttack(unit);
-            }
-            else
-            {
-                CastDisease(unit);
-            }
-        }
-
+        [UnitAction(UnitActionType.Attack)]
         public void CastDisease(IUnit unit)
         {
             unit.BecomeDiseased(this);
         }
 
+        [UnitAction(UnitActionType.Attack)]
         public void MagicAttack(IUnit unit)
         {
             unit.TakeDamage(Damage, this, "magic");

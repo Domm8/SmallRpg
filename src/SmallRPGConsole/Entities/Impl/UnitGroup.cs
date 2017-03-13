@@ -24,13 +24,13 @@ namespace SmallRPG.Entities.Impl
             GameLogger.Instance.Log(string.Format("\nStart Fighting! {0} VS {1}!", this, unitGroup));
             while (IsSomeBodyAlive() && unitGroup.IsSomeBodyAlive())
             {
-                var allyFighter = GetFighter();
-                allyFighter.FightWith(GetTarget(allyFighter, unitGroup, this));
+                FightOrHelp(GetFighter(), unitGroup, this);
 
+                Console.ReadLine();
                 if (unitGroup.IsSomeBodyAlive())
                 {
-                    var opositeFighter = unitGroup.GetFighter();
-                    opositeFighter.FightWith(GetTarget(opositeFighter, this, unitGroup));
+                    FightOrHelp(unitGroup.GetFighter(), this, unitGroup);
+                    Console.ReadLine();
                 }
             }
             var winner = IsSomeBodyAlive() ? this : unitGroup;
@@ -88,19 +88,33 @@ namespace SmallRPG.Entities.Impl
             return null;
         }
 
+        private static void FightOrHelp(IFighter fighter, UnitGroup opositeGroup, UnitGroup currentGroup)
+        {
+            var isAttack = new Random().Next(0, 100) > 49;
+            if (!isAttack && fighter.IsHelpfull())
+            {
+                fighter.HelpTo(currentGroup.GetTargetExeptCurrentFighter(fighter));
+            }
+            else
+            {
+                fighter.FightWith(GetTarget(fighter, opositeGroup, currentGroup));
+            }
+
+        }
+
         private static IUnit GetTarget(IFighter attacker, UnitGroup opositeGroup, UnitGroup currentGroup)
         {
-            var isRandomlyImproved = new Random().Next(0, 100) > 49;
+            //var isRandomlyImproved = new Random().Next(0, 100) > 49;
 
-            if (attacker is IUnitImprover && isRandomlyImproved)
-            {
-                return currentGroup.GetTargetExeptCurrentFighter(attacker);
-            }
+            //if (attacker is IUnitImprover && isRandomlyImproved)
+            //{
+            //    return currentGroup.GetTargetExeptCurrentFighter(attacker);
+            //}
             var isSomebodyImproved = opositeGroup.IsSomeBodyImproved();
-            if (attacker is ICurseCaster && !isSomebodyImproved && attacker is IUnitImprover)
-            {
-                return currentGroup.GetTargetExeptCurrentFighter(attacker);
-            }
+            //if (attacker is ICurseCaster && !isSomebodyImproved && attacker is IUnitImprover)
+            //{
+            //    return currentGroup.GetTargetExeptCurrentFighter(attacker);
+            //}
             if (attacker is ICurseCaster && isSomebodyImproved)
             {
                 var target = opositeGroup.GetImprovedTarget(attacker);

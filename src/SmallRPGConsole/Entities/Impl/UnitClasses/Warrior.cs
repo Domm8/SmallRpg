@@ -1,5 +1,7 @@
-﻿using SmallRPG.Entities.Interface;
+﻿using SmallRPG.Attributes;
+using SmallRPG.Entities.Interface;
 using SmallRPG.Enums;
+using SmallRPG.Services;
 
 namespace SmallRPG.Entities.Impl.UnitClasses
 {
@@ -50,7 +52,8 @@ namespace SmallRPG.Entities.Impl.UnitClasses
         {
         }
 
-        public override void Combat(IUnit unit)
+        [UnitAction]
+        public void MeeleAttack(IUnit unit)
         {
             unit.TakeDamage(Damage, this, "meele");
         }

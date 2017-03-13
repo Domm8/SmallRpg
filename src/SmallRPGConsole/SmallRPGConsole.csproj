@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\Impl\UnitClasses\CrossBowMan.cs" />
     <Compile Include="Entities\Impl\UnitGroup.cs" />
     <Compile Include="Entities\Impl\UnitClasses\Necromancer.cs" />
     <Compile Include="Entities\Impl\UnitClasses\RangeUnit.cs" />
@@ -53,13 +54,16 @@
     <Compile Include="Entities\Interface\IDiseaseCaster.cs" />
     <Compile Include="Entities\Interface\IUnit.cs" />
     <Compile Include="Entities\Interface\IFighter.cs" />
+    <Compile Include="Entities\Interface\IUnitHealer.cs" />
     <Compile Include="Entities\Interface\IUnitImprover.cs" />
     <Compile Include="Entities\Interface\IWisard.cs" />
     <Compile Include="Enums\Race.cs" />
+    <Compile Include="Enums\UnitActionType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\GameLogger.cs" />
     <Compile Include="Services\Helper.cs" />
+    <Compile Include="Attributes\UnitActionAttribute.cs" />
     <Compile Include="Services\UnitFactory.cs" />
   </ItemGroup>
   <ItemGroup>
