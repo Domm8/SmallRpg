@@ -4,6 +4,7 @@ namespace SmallRPG.Entities.Interface
 {
     public interface IUnit
     {
+        bool IsLeader { get; }
         Race UnitRace { get; }
 
         void TakeDamage(double damage, IUnit attacker, string attackName);

@@ -9,13 +9,14 @@ namespace SmallRPG.Entities.Impl
 {
     public class UnitGroup
     {
-        private readonly List<IFighter> _units;
+        private readonly List<Unit> _units;
         private Race Race { get; set; }
 
         public UnitGroup(Race race)
         {
             Race = race;
             _units = UnitFactory.GetGroupUnits(race);
+            _units.SelectLider();
         }
 
         public void StartFighting(UnitGroup unitGroup)
@@ -34,6 +35,7 @@ namespace SmallRPG.Entities.Impl
             }
             var winner = IsSomeBodyAlive() ? this : unitGroup;
             GameLogger.Instance.Log(string.Format("{0} is the winner!", winner));
+            GameLogger.Instance.Log(winner.GetAliveUnits().PrintUnits());
         }
 
         public override string ToString()
@@ -43,49 +45,52 @@ namespace SmallRPG.Entities.Impl
 
         public bool IsSomeBodyAlive()
         {
-            var isAlive = GetAliveUnits().Any();
-            return isAlive;
+           return GetAliveUnits().Any();
         }
         
         public bool IsSomeBodyImproved()
         {
-            var isImproved = GetAliveUnits().Any(u => u.IsImproved);
-            return isImproved;
+            return GetAliveUnits().Any(u => u.IsImproved);
         }
 
-        public IFighter GetTarget()
+        public IUnit GetTarget()
+        {
+            return GetAliveUnits().GetRandomUnit();
+        }
+
+        public IUnit GetTargetExeptCurrentFighter(IFighter attacker)
         {
             var aliveUnits = GetAliveUnits();
-            var index = new Random().Next(0, aliveUnits.Count);
-            return aliveUnits[index];
-        }
-
-        public IFighter GetTargetExeptCurrentFighter(IFighter attacker)
-        {
-            var aliveUnits = GetAliveUnits().ToList();
             if (aliveUnits.Count > 1)
             {
-                aliveUnits = GetAliveUnits().Where(f => !f.Equals(attacker)).ToList();
+                aliveUnits = aliveUnits.Where(f => !f.Equals(attacker)).ToList();
             }
-            var index = new Random().Next(0, aliveUnits.Count);
-            return aliveUnits[index];
+            return aliveUnits.GetRandomUnit();
         }
 
-        public IFighter GetImprovedTarget(IFighter attacker)
+        public IUnit GetImprovedTarget(IFighter attacker)
         {
-            var aliveUnits = GetAliveUnits();
-            var improvedUnits = aliveUnits.Where(u => u.IsImproved).ToList();
+            var improvedUnits = GetAliveUnits().Where(u => u.IsImproved).ToList();
             if (improvedUnits.Count > 0)
             {
-                var improvedIndex = new Random().Next(0, improvedUnits.Count);
-                return improvedUnits[improvedIndex];
+                return improvedUnits.GetRandomUnit();
             }
             return null;
         }
 
-        private static IFighter GetTarget(IFighter attacker, UnitGroup opositeGroup, UnitGroup currentGroup)
+        public IUnit GetNotDiseasedTarget(IFighter attacker)
         {
-            var isRandomlyImproved = new Random().Next(0, 10) > 4;
+            var notDiseasedUnits = GetAliveUnits().Where(u => !u.IsDiseased).ToList();
+            if (notDiseasedUnits.Count > 0)
+            {
+                return notDiseasedUnits.GetRandomUnit();
+            }
+            return null;
+        }
+
+        private static IUnit GetTarget(IFighter attacker, UnitGroup opositeGroup, UnitGroup currentGroup)
+        {
+            var isRandomlyImproved = new Random().Next(0, 100) > 49;
 
             if (attacker is IUnitImprover && isRandomlyImproved)
             {
@@ -98,7 +103,13 @@ namespace SmallRPG.Entities.Impl
             }
             if (attacker is ICurseCaster && isSomebodyImproved)
             {
-                return opositeGroup.GetImprovedTarget(attacker);
+                var target = opositeGroup.GetImprovedTarget(attacker);
+                if (target != null) { return target; }
+            }
+            if (attacker is IDiseaseCaster)
+            {
+                var target = opositeGroup.GetNotDiseasedTarget(attacker);
+                if (target != null) { return target; }
             }
             return opositeGroup.GetTarget();
         }
@@ -109,13 +120,12 @@ namespace SmallRPG.Entities.Impl
             var improvedUnits = aliveUnits.Where(u => u.IsImproved).ToList();
             if (improvedUnits.Count > 0)
             {
-                var improvedIndex = new Random().Next(0, improvedUnits.Count);
-                return improvedUnits[improvedIndex];
+                return improvedUnits.GetRandomUnit();
             }
-            return aliveUnits[new Random().Next(0, aliveUnits.Count)];
+            return aliveUnits.GetRandomUnit();
         }
 
-        private List<IFighter> GetAliveUnits()
+        private List<Unit> GetAliveUnits()
         {
             return _units.Where(u => u.IsAlive).ToList();
         }

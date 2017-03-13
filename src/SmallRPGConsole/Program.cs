@@ -8,6 +8,7 @@ namespace SmallRPG
     {
         static void Main(string[] args)
         {
+            Console.SetWindowSize(120, 35);
             var random = new Random();
             var firstRace = random.Next(0, 100) > 49 ? Race.Elf : Race.Human;
             var secondRace = random.Next(0, 100) > 49 ? Race.Orc : Race.Undead;

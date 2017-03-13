@@ -4,6 +4,7 @@
     {
         bool IsAlive { get; }
         bool IsImproved { get; }
-        void FightWith(IFighter unit);
+        bool IsDiseased { get; }
+        void FightWith(IUnit unit);
     }
 }

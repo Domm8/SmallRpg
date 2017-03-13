@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmallRPG", "SmallRPG\SmallRPG.csproj", "{471CAEC6-472E-4F2F-8477-D467B9776673}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmallRPGConsole", "SmallRPGConsole\SmallRPGConsole.csproj", "{471CAEC6-472E-4F2F-8477-D467B9776673}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

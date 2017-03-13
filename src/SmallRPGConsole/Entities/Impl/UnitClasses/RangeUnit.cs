@@ -14,12 +14,14 @@ namespace SmallRPG.Entities.Impl.UnitClasses
                 switch (UnitRace)
                 {
                     case Race.Elf:
+                        damage = 6;
+                        break;
                     case Race.Human:
-                        damage = 3;
+                        damage = 5;
                         break;
                     case Race.Undead:
                     case Race.Orc:
-                        damage = 2;
+                        damage = 4;
                         break;
                 }
                 return damage * DamageMultiplier;
@@ -34,16 +36,16 @@ namespace SmallRPG.Entities.Impl.UnitClasses
                 switch (UnitRace)
                 {
                     case Race.Elf:
-                        damage = 7;
+                        damage = 9;
                         break;
                     case Race.Human:
-                        damage = 5;
+                        damage = 6;
                         break;
                     case Race.Orc:
-                        damage = 3;
+                        damage = 4;
                         break;
                     case Race.Undead:
-                        damage = 4;
+                        damage = 5;
                         break;
                 }
                 return damage * DamageMultiplier;

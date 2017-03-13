@@ -25,8 +25,8 @@ namespace SmallRPG.Entities.Impl.UnitClasses
         public override void Combat(IUnit unit)
         {
             var random = new Random();
-            var next = random.Next(0, 10);
-            if (next > 4)
+            var next = random.Next(0, 100);
+            if (next > 49)
             {
                 MagicAttack(unit);
             }
