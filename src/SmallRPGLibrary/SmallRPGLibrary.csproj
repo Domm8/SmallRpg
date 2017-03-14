@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{471CAEC6-472E-4F2F-8477-D467B9776673}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{43EAED89-5494-4D06-A224-3B6CCB6FE664}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SmallRPGConsole</RootNamespace>
-    <AssemblyName>SmallRPGConsole</AssemblyName>
+    <RootNamespace>SmallRPGLibrary</RootNamespace>
+    <AssemblyName>SmallRPGLibrary</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -42,17 +40,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Attributes\UnitActionAttribute.cs" />
+    <Compile Include="Consts\DefaultValues.cs" />
+    <Compile Include="Entities\Impl\Unit.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\CrossBowMan.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Necromancer.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\RangeUnit.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Shaman.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Warrior.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Wisard.cs" />
+    <Compile Include="Entities\Impl\UnitGroup.cs" />
+    <Compile Include="Entities\Interface\ICurseCaster.cs" />
+    <Compile Include="Entities\Interface\IDiseaseCaster.cs" />
+    <Compile Include="Entities\Interface\IFighter.cs" />
+    <Compile Include="Entities\Interface\IUnit.cs" />
+    <Compile Include="Entities\Interface\IUnitHealer.cs" />
+    <Compile Include="Entities\Interface\IUnitImprover.cs" />
+    <Compile Include="Entities\Interface\IWisard.cs" />
+    <Compile Include="Enums\Race.cs" />
+    <Compile Include="Enums\UnitActionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SmallRPGLibrary\SmallRPGLibrary.csproj">
-      <Project>{43eaed89-5494-4d06-a224-3b6ccb6fe664}</Project>
-      <Name>SmallRPGLibrary</Name>
-    </ProjectReference>
+    <Compile Include="Services\GameLogger.cs" />
+    <Compile Include="Services\ExtensionHelper.cs" />
+    <Compile Include="Services\UnitAction.cs" />
+    <Compile Include="Services\UnitFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

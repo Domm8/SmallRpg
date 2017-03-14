@@ -1,4 +1,4 @@
-﻿namespace SmallRPG.Enums
+﻿namespace SmallRPGLibrary.Enums
 {
     public enum Race
     {

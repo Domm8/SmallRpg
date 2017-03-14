@@ -1,9 +1,10 @@
-﻿using SmallRPG.Enums;
+﻿using SmallRPGLibrary.Enums;
 
-namespace SmallRPG.Entities.Interface
+namespace SmallRPGLibrary.Entities.Interface
 {
     public interface IUnit
     {
+        double Health { get; }
         bool IsLeader { get; }
         bool IsImproved { get; }
         bool IsDiseased { get; }

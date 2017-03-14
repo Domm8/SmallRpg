@@ -1,10 +1,11 @@
-﻿using SmallRPG.Attributes;
-using SmallRPG.Entities.Interface;
-using SmallRPG.Enums;
+﻿using SmallRPGLibrary.Entities.Impl;
+using SmallRPGLibrary.Entities.Interface;
+using SmallRPGLibrary.Enums;
 using System;
-using SmallRPG.Services;
+using SmallRPGLibrary.Services;
+using SmallRPGLibrary.Attributes;
 
-namespace SmallRPG.Entities.Impl.UnitClasses
+namespace SmallRPGLibrary.Entities.Impl.UnitClasses
 {
     public class Necromancer : Unit, IDiseaseCaster, IWisard
     {

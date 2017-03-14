@@ -1,14 +1,14 @@
-﻿using SmallRPG.Attributes;
-using SmallRPG.Entities.Interface;
-using SmallRPG.Enums;
+﻿using SmallRPGLibrary.Entities.Interface;
+using SmallRPGLibrary.Enums;
 using System;
+using SmallRPGLibrary.Attributes;
 
-namespace SmallRPG.Entities.Impl.UnitClasses
+namespace SmallRPGLibrary.Entities.Impl.UnitClasses
 {
     public class Wisard : Unit, IUnitImprover, IWisard
     {
 
-        private double Damage
+        protected virtual double Damage
         {
             get
             {
@@ -26,15 +26,16 @@ namespace SmallRPG.Entities.Impl.UnitClasses
             }
         }
 
-        public Wisard(Race unitRace) : base(unitRace)
+        protected virtual string MagicAttackName
         {
-            if (IsDarkRace)
-            {
-                throw new ArgumentException("Unit Race for class Wisard could not include Dark races like Orcs or Undeads.");
-            }
+            get { return "Magic"; }
         }
 
-        [UnitAction(UnitActionType.Help)]
+        public Wisard(Race unitRace) : base(unitRace)
+        {
+        }
+
+        [UnitAction(UnitActionType.HelpBuff)]
         public void ImproveUnit(IUnit unit)
         {
             unit.BecomeImproved(this);
@@ -43,7 +44,7 @@ namespace SmallRPG.Entities.Impl.UnitClasses
         [UnitAction(UnitActionType.Attack)]
         public void MagicAttack(IUnit unit)
         {
-            unit.TakeDamage(Damage, this, "magic");
+            unit.TakeDamage(Damage, this, MagicAttackName);
         }
     }
 }

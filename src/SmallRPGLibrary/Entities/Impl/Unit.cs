@@ -1,36 +1,36 @@
-﻿using SmallRPG.Attributes;
-using SmallRPG.Entities.Interface;
-using SmallRPG.Enums;
-using SmallRPG.Services;
+﻿using SmallRPGLibrary.Consts;
+using SmallRPGLibrary.Entities.Interface;
+using SmallRPGLibrary.Enums;
+using SmallRPGLibrary.Services;
 using System;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using SmallRPGLibrary.Attributes;
 
-namespace SmallRPG.Entities.Impl
+namespace SmallRPGLibrary.Entities.Impl
 {
     public abstract class Unit : IUnit, IFighter, IFormattable
     {
         private double _health;
 
-        private double Health
+        public double Health
         {
             get { return _health; }
-            set
+            private set
             {
-                if (value <= 100 && value > 0)
+                if (value <= DefaultValues.UNIT_MAX_HEALTH && value > 0)
                 {
                     _health = value;
                 }
-                else if (value > 100)
+                else if (value > DefaultValues.UNIT_MAX_HEALTH)
                 {
-                    _health = 100;
+                    _health = DefaultValues.UNIT_MAX_HEALTH;
                 }
                 else
                 {
                     _health = 0;
                 }
-                
             }
         }
 
@@ -73,7 +73,7 @@ namespace SmallRPG.Entities.Impl
         {
             UnitRace = unitRace;
             DamageMultiplier = 1;
-            Health = 100;
+            Health = DefaultValues.UNIT_MAX_HEALTH;
         }
 
         protected Unit(Race unitRace, int unitIndex) : this(unitRace)
@@ -89,11 +89,16 @@ namespace SmallRPG.Entities.Impl
 
         public void HelpTo(IUnit unit)
         {
-            InvokeUnitAction(UnitActionType.Help | UnitActionType.Heal, unit);
+            InvokeUnitAction(UnitActionType.HelpBuff, unit);
             if (!unit.Equals(this))
             {
                 ClearBuffs();
             }
+        }
+
+        public void HealUnit(IUnit unit)
+        {
+            InvokeUnitAction(UnitActionType.Heal, unit);
         }
 
         public void TakeDamage(double damage, IUnit attacker, string attackName)
@@ -118,7 +123,7 @@ namespace SmallRPG.Entities.Impl
             {
                 Health += health;
 
-                GameLogger.Instance.Log(string.Format("{1} healed by {0} with {2}. Target unit restored {3} HP. Current unit HP {4}",
+                GameLogger.Instance.Log(string.Format("{0} healed by {1} with {2}. Target unit restored {3} HP. Current unit HP {4}",
                     this, healer, healingName, health, Health));
             }
             else
@@ -240,7 +245,14 @@ namespace SmallRPG.Entities.Impl
         {
             var methodInfos = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             return methodInfos.Any(m => m.GetCustomAttributes<UnitActionAttribute>()
-                .Any(ua => ua.UnitActionType.Equals(UnitActionType.Help | UnitActionType.Heal)));
+                .Any(ua => ua.UnitActionType.HasAnyFlag(UnitActionType.HelpBuff)));
+        }
+
+        public bool IsHealer()
+        {
+            return GetType()
+                    .GetCustomAttributes<UnitActionAttribute>()
+                    .Any(ua => ua.UnitActionType.HasAnyFlag(UnitActionType.Heal));
         }
 
         private string UnitToString()
@@ -258,7 +270,7 @@ namespace SmallRPG.Entities.Impl
             var unitActionMethods = methodInfos.Where(m => m.GetCustomAttributes<UnitActionAttribute>().Any());
             var unitAttackMethods =
                 unitActionMethods.Where(
-                    m => m.GetCustomAttribute<UnitActionAttribute>().UnitActionType.Equals(actionType))
+                    m => m.GetCustomAttribute<UnitActionAttribute>().UnitActionType.HasAnyFlag(actionType))
                                  .ToDictionary(m => m.Name);
 
             if (unitAttackMethods != null && unitAttackMethods.Count > 0)

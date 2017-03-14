@@ -1,13 +1,13 @@
 ﻿using System;
-using SmallRPG.Attributes;
-using SmallRPG.Entities.Interface;
-using SmallRPG.Enums;
+using SmallRPGLibrary.Entities.Interface;
+using SmallRPGLibrary.Enums;
+using SmallRPGLibrary.Attributes;
 
-namespace SmallRPG.Entities.Impl.UnitClasses
+namespace SmallRPGLibrary.Entities.Impl.UnitClasses
 {
     public class RangeUnit : Unit
     {
-        private double Damage
+        protected double Damage
         {
             get
             {
@@ -29,7 +29,7 @@ namespace SmallRPG.Entities.Impl.UnitClasses
             }
         }
 
-        private double RangeDamage
+        protected double RangeDamage
         {
             get
             {
@@ -62,8 +62,6 @@ namespace SmallRPG.Entities.Impl.UnitClasses
                     case Race.Elf:
                     case Race.Orc:
                         return "Bowman";
-                    case Race.Human:
-                        return "Crossbowman";
                     case Race.Undead:
                         return "Hunter";
                 }
@@ -83,7 +81,7 @@ namespace SmallRPG.Entities.Impl.UnitClasses
         }
 
         [UnitAction(UnitActionType.Attack)]
-        private void RangeAttack(IUnit target)
+        protected virtual void RangeAttack(IUnit target)
         {
             target.TakeDamage(RangeDamage, this, "bow");
         }

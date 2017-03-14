@@ -1,4 +1,4 @@
-﻿namespace SmallRPG.Entities.Interface
+﻿namespace SmallRPGLibrary.Entities.Interface
 {
     public interface IDiseaseCaster
     {

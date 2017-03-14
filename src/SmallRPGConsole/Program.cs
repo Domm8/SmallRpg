@@ -1,8 +1,8 @@
 ﻿using System;
-using SmallRPG.Entities.Impl;
-using SmallRPG.Enums;
+using SmallRPGLibrary.Entities.Impl;
+using SmallRPGLibrary.Enums;
 
-namespace SmallRPG
+namespace SmallRPGConsole
 {
     internal class Program
     {

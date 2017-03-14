@@ -1,9 +1,9 @@
-﻿using SmallRPG.Attributes;
-using SmallRPG.Entities.Interface;
-using SmallRPG.Enums;
-using SmallRPG.Services;
+﻿using SmallRPGLibrary.Entities.Interface;
+using SmallRPGLibrary.Enums;
+using SmallRPGLibrary.Services;
+using SmallRPGLibrary.Attributes;
 
-namespace SmallRPG.Entities.Impl.UnitClasses
+namespace SmallRPGLibrary.Entities.Impl.UnitClasses
 {
     public class Warrior : Unit
     {

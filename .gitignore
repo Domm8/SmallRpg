@@ -1,4 +1,6 @@
 src/SmallRPGConsole/bin
 src/SmallRPGConsole/obj
-*.suo
+src/SmallRPG.v11.suo
 Logs/
+src/SmallRPGLibrary/bin
+src/SmallRPGLibrary/obj

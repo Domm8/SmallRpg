@@ -1,7 +1,7 @@
-﻿using SmallRPG.Attributes;
-using SmallRPG.Enums;
+﻿using SmallRPGLibrary.Enums;
+using SmallRPGLibrary.Attributes;
 
-namespace SmallRPG.Entities.Interface
+namespace SmallRPGLibrary.Entities.Interface
 {
     public interface IUnitHealer
     {

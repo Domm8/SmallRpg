@@ -1,9 +1,9 @@
 ﻿using System;
-using SmallRPG.Enums;
+using SmallRPGLibrary.Enums;
 
-namespace SmallRPG.Attributes
+namespace SmallRPGLibrary.Attributes
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
     public class UnitActionAttribute : Attribute
     {
         private readonly UnitActionType _actionType;
