@@ -24,7 +24,7 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         [UnitAction(UnitActionType.Heal)]
         public void Heal(IUnit unit)
         {
-            unit.Healing(4 * DamageMultiplier, this, "bandaging");
+            unit.Healing(3 * DamageMultiplier, this, "bandaging");
         }
 
         protected override void RangeAttack(IUnit target)

@@ -1,4 +1,5 @@
 ﻿using System;
+using SmallRPGLibrary.Entities.Impl.Base;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using SmallRPGLibrary.Attributes;
@@ -75,7 +76,7 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         }
 
         [UnitAction(UnitActionType.Attack)]
-        private void MeleeAttack(IUnit target)
+        protected void MeleeAttack(IUnit target)
         {
             target.TakeDamage(Damage, this, "sword");
         }

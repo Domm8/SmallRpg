@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using SmallRPGLibrary.Consts;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using SmallRPGLibrary.Services;
 
-namespace SmallRPGLibrary.Entities.Impl
+namespace SmallRPGLibrary.Entities.Impl.Base
 {
     public class UnitGroup
     {
@@ -56,7 +55,7 @@ namespace SmallRPGLibrary.Entities.Impl
 
         public bool IsNeedHeal()
         {
-            return GetAliveUnits().Any(u => u.Health < DefaultValues.UNIT_MAX_HEALTH);
+            return GetAliveUnits().Any(u => u.Health < DefaultValues.UNIT_NEED_HEAL_HEALTH);
         }
 
         public IUnit GetTarget()
@@ -64,13 +63,9 @@ namespace SmallRPGLibrary.Entities.Impl
             return GetAliveUnits().GetRandomUnit();
         }
 
-        public IUnit GetTargetExeptCurrentFighter(IFighter attacker)
+        public IUnit GetNotImprovedTarget(IFighter attacker)
         {
-            var aliveUnits = GetAliveUnits();
-            if (aliveUnits.Count > 1)
-            {
-                aliveUnits = aliveUnits.Where(f => !f.Equals(attacker)).ToList();
-            }
+            var aliveUnits = GetAliveUnits().Where(f => !f.IsImproved).ToList();
             return aliveUnits.GetRandomUnit();
         }
 
@@ -103,31 +98,50 @@ namespace SmallRPGLibrary.Entities.Impl
         {
             if (UnitAction.Random && fighter.IsHelpfull())
             {
-                fighter.HelpTo(currentGroup.GetTargetExeptCurrentFighter(fighter));
+                var target = currentGroup.GetNotImprovedTarget(fighter);
+                if (target != null)
+                {
+                    fighter.HelpTo(target);
+                    return;
+                }
             }
-            else if (UnitAction.Random && fighter.IsHealer() && currentGroup.IsNeedHeal())
+            if (UnitAction.Random)
+            {
+                UnitActionType type;
+                fighter.FightWith(GetTarget(fighter, opositeGroup, out type), type);
+            }
+            else if (fighter.IsHealer() && currentGroup.IsNeedHeal())
             {
                 fighter.HealUnit(currentGroup.GetTargetWithLowerHealth());
             }
             else
             {
-                fighter.FightWith(GetTarget(fighter, opositeGroup, currentGroup));
+                UnitActionType type;
+                fighter.FightWith(GetTarget(fighter, opositeGroup, out type), type);
             }
-
         }
 
-        private static IUnit GetTarget(IFighter attacker, UnitGroup opositeGroup, UnitGroup currentGroup)
+        private static IUnit GetTarget(IFighter attacker, UnitGroup opositeGroup, out UnitActionType type)
         {
             if (UnitAction.Random && attacker is ICurseCaster && opositeGroup.IsSomeBodyImproved())
             {
                 var target = opositeGroup.GetImprovedTarget(attacker);
-                if (target != null) { return target; }
+                if (target != null)
+                {
+                    type = UnitActionType.Curse;
+                    return target;
+                }
             }
             if (UnitAction.Random && attacker is IDiseaseCaster)
             {
                 var target = opositeGroup.GetNotDiseasedTarget(attacker);
-                if (target != null) { return target; }
+                if (target != null)
+                {
+                    type = UnitActionType.Disease;
+                    return target;
+                }
             }
+            type = UnitActionType.Attack;
             return opositeGroup.GetTarget();
         }
 

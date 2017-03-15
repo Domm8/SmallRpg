@@ -1,5 +1,5 @@
 ﻿using System;
-using SmallRPGLibrary.Entities.Impl;
+using SmallRPGLibrary.Entities.Impl.Base;
 using SmallRPGLibrary.Enums;
 
 namespace SmallRPGConsole

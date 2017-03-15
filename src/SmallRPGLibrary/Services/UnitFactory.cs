@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SmallRPGLibrary.Entities.Impl;
+using SmallRPGLibrary.Entities.Impl.Base;
 using SmallRPGLibrary.Entities.Impl.UnitClasses;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
@@ -12,7 +13,7 @@ namespace SmallRPGLibrary.Services
     {
         private const int WISARD_UNIT_COUNT = 1;
         private const int RANGE_UNIT_COUNT = 3;
-        private const int MEELE_UNIT_COUNT = 4;
+        private const int MEELE_UNIT_COUNT = 2;
         private const int LIST_COUNT = WISARD_UNIT_COUNT + RANGE_UNIT_COUNT + MEELE_UNIT_COUNT;
 
         private static Unit GetWisardUnit(Race race)
@@ -20,6 +21,7 @@ namespace SmallRPGLibrary.Services
             switch (race)
             {
                 case Race.Elf:
+                    return new Druid(race);
                 case Race.Human:
                     return new Wisard(race);
                 case Race.Orc:

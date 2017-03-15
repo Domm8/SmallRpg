@@ -1,4 +1,6 @@
-﻿using SmallRPGLibrary.Consts;
+﻿using System.Collections.Generic;
+using SmallRPGLibrary.Consts;
+using SmallRPGLibrary.Entities.Impl.Buffs;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using SmallRPGLibrary.Services;
@@ -8,11 +10,12 @@ using System.Linq;
 using System.Reflection;
 using SmallRPGLibrary.Attributes;
 
-namespace SmallRPGLibrary.Entities.Impl
+namespace SmallRPGLibrary.Entities.Impl.Base
 {
     public abstract class Unit : IUnit, IFighter, IFormattable
     {
         private double _health;
+        private readonly List<Buff> _buffList;
 
         public double Health
         {
@@ -74,6 +77,7 @@ namespace SmallRPGLibrary.Entities.Impl
             UnitRace = unitRace;
             DamageMultiplier = 1;
             Health = DefaultValues.UNIT_MAX_HEALTH;
+            _buffList = new List<Buff>();
         }
 
         protected Unit(Race unitRace, int unitIndex) : this(unitRace)
@@ -81,24 +85,23 @@ namespace SmallRPGLibrary.Entities.Impl
             UnitIndex = unitIndex;
         }
 
-        public void FightWith(IUnit unit)
+        public void FightWith(IUnit unit, UnitActionType actionType)
         {
-            InvokeUnitAction(UnitActionType.Attack, unit);
-            ClearBuffs();
+            RemoveUnActiveBuffs();
+            InvokeUnitAction(actionType, unit);
         }
 
         public void HelpTo(IUnit unit)
         {
+            RemoveUnActiveBuffs();
             InvokeUnitAction(UnitActionType.HelpBuff, unit);
-            if (!unit.Equals(this))
-            {
-                ClearBuffs();
-            }
         }
 
         public void HealUnit(IUnit unit)
         {
+            RemoveUnActiveBuffs();
             InvokeUnitAction(UnitActionType.Heal, unit);
+            
         }
 
         public void TakeDamage(double damage, IUnit attacker, string attackName)
@@ -117,6 +120,22 @@ namespace SmallRPGLibrary.Entities.Impl
            
         }
 
+        public void LooseHealth(double damage, string attackName)
+        {
+            if (IsAlive)
+            {
+                Health -= damage;
+                var hpLeftText = IsAlive ? string.Format("{0} HP left.", Health) : string.Format("Unit {0} is dead.", this);
+                GameLogger.Instance.Log(string.Format("{0} unit loose {2} HP because of {1}. {3}",
+                    this, attackName, damage, hpLeftText));
+            }
+            else
+            {
+                GameLogger.Instance.Log(string.Format("{0} is already dead.", this));
+            }
+           
+        }
+
         public void Healing(double health, IUnitHealer healer, string healingName)
         {
             if (IsAlive)
@@ -124,7 +143,7 @@ namespace SmallRPGLibrary.Entities.Impl
                 Health += health;
 
                 GameLogger.Instance.Log(string.Format("{0} healed by {1} with {2}. Target unit restored {3} HP. Current unit HP {4}",
-                    this, healer, healingName, health, Health));
+                    this, healer, healingName, health, Health), LogLevel.Heal);
             }
             else
             {
@@ -136,13 +155,33 @@ namespace SmallRPGLibrary.Entities.Impl
         {
             if (IsAlive && !_isImproved)
             {
-                GameLogger.Instance.Log(string.Format("{0} was improved by {1}", this, caster));
+                GameLogger.Instance.Log(string.Format("{0} was improved by {1}", this, caster), LogLevel.Improve);
                 _isImproved = true;
                 DamageMultiplier = DamageMultiplier * 1.5;
             }
             else
             {
-                GameLogger.Instance.Log(string.Format("{0} can not be improved by {1}, bacause he is already improved or he is dead.", this, caster));
+                GameLogger.Instance.Log(
+                    string.Format("{0} can not be improved by {1}, bacause he is already improved or he is dead.", this,
+                                  caster), LogLevel.Improve);
+            }
+        }
+
+        public void BecomeUnImproved()
+        {
+            if (IsAlive && _isImproved)
+            {
+                _isImproved = false;
+                DamageMultiplier = DamageMultiplier / 1.5;
+            }
+        }
+
+        public void BecomeUnDiseased()
+        {
+            if (IsAlive && _isDiseased)
+            {
+                _isDiseased = false;
+                DamageMultiplier = DamageMultiplier / 0.5;
             }
         }
 
@@ -150,8 +189,7 @@ namespace SmallRPGLibrary.Entities.Impl
         {
             if (IsAlive && _isImproved)
             {
-                _isImproved = false;
-                DamageMultiplier = DamageMultiplier / 1.5;
+                BecomeUnImproved();
                 GameLogger.Instance.Log(string.Format("{0} was cursed by {1}", this, caster));
             }
             else
@@ -241,6 +279,12 @@ namespace SmallRPGLibrary.Entities.Impl
             }
         }
 
+        public void AddBuff(Buff buff)
+        {
+            buff.DoFirstBuffing();
+            _buffList.Add(buff);
+        }
+
         public bool IsHelpfull()
         {
             var methodInfos = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
@@ -268,18 +312,29 @@ namespace SmallRPGLibrary.Entities.Impl
         {
             var methodInfos = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             var unitActionMethods = methodInfos.Where(m => m.GetCustomAttributes<UnitActionAttribute>().Any());
-            var unitAttackMethods =
+            var unitMethods =
                 unitActionMethods.Where(
                     m => m.GetCustomAttribute<UnitActionAttribute>().UnitActionType.HasAnyFlag(actionType))
                                  .ToDictionary(m => m.Name);
-
-            if (unitAttackMethods != null && unitAttackMethods.Count > 0)
+            try
             {
-                var keys = unitAttackMethods.Keys.ToList();
-                var keyIndex = new Random().Next(0, keys.Count);
-                var method = unitAttackMethods[keys[keyIndex]];
-                method.Invoke(this, new object[] { unit });
+                if (unitMethods != null && unitMethods.Count > 0)
+                {
+                    var keys = unitMethods.Keys.ToList();
+                    var keyIndex = new Random().Next(0, keys.Count);
+                    var method = unitMethods[keys[keyIndex]];
+                    method.Invoke(this, new object[] { unit });
+                }
+                else
+                {
+                    GameLogger.Instance.Log(string.Format("Error occured unitMethods is empty!"), LogLevel.Error);
+                }
             }
+            catch (Exception)
+            {
+                GameLogger.Instance.Log(string.Format("Error occured while invocing one of unitMethods!"), LogLevel.Error);
+            }
+
         }
 
         private void ClearBuffs()
@@ -287,6 +342,30 @@ namespace SmallRPGLibrary.Entities.Impl
             DamageMultiplier = IsLeader ? 1.5 : 1;
             _isImproved = false;
             _isDiseased = false;
+        }
+
+        private void ToNextRound()
+        {
+            _buffList.ForEach(b =>
+                {
+                    if (b.IsActive)
+                    {
+                        b.NextRound();
+                    }
+                });
+        }
+
+        private void RemoveUnActiveBuffs()
+        {
+            _buffList.ForEach(b =>
+                {
+                    if (!b.IsActive)
+                    {
+                        b.Deactivate();
+                    }
+                });
+            _buffList.RemoveAll(b => !b.IsActive);
+            ToNextRound();
         }
     }
 }

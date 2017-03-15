@@ -1,6 +1,6 @@
-﻿using SmallRPGLibrary.Entities.Interface;
+﻿using SmallRPGLibrary.Entities.Impl.Base;
+using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
-using SmallRPGLibrary.Services;
 using SmallRPGLibrary.Attributes;
 
 namespace SmallRPGLibrary.Entities.Impl.UnitClasses

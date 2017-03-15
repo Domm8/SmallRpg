@@ -1,4 +1,6 @@
-﻿using SmallRPGLibrary.Entities.Interface;
+﻿using SmallRPGLibrary.Entities.Impl.Base;
+using SmallRPGLibrary.Entities.Impl.Buffs;
+using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using System;
 using SmallRPGLibrary.Attributes;
@@ -19,7 +21,7 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
                         damage = 10;
                         break;
                     case Race.Human:
-                        damage = 4;
+                        damage = 6;
                         break;
                 }
                 return damage * DamageMultiplier;
@@ -38,7 +40,7 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         [UnitAction(UnitActionType.HelpBuff)]
         public void ImproveUnit(IUnit unit)
         {
-            unit.BecomeImproved(this);
+            unit.AddBuff(new ImprovementBuff(unit, this));
         }
 
         [UnitAction(UnitActionType.Attack)]

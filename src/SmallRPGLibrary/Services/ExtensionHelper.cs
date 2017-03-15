@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SmallRPGLibrary.Entities.Impl;
+using SmallRPGLibrary.Entities.Impl.Base;
 using SmallRPGLibrary.Entities.Interface;
 
 namespace SmallRPGLibrary.Services
@@ -30,6 +30,10 @@ namespace SmallRPGLibrary.Services
 
         public static Unit GetRandomUnit(this List<Unit> list)
         {
+            if (list.Count <= 0)
+            {
+                return null;
+            }
             var random = new Random();
             var bigIndex1 = random.Next(0, list.Count * 25);
             var bigIndex2 = random.Next(0, list.Count * 25) * random.Next(0, 2);

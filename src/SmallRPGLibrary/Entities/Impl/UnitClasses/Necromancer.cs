@@ -1,8 +1,8 @@
-﻿using SmallRPGLibrary.Entities.Impl;
+﻿using SmallRPGLibrary.Entities.Impl.Base;
+using SmallRPGLibrary.Entities.Impl.Buffs;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using System;
-using SmallRPGLibrary.Services;
 using SmallRPGLibrary.Attributes;
 
 namespace SmallRPGLibrary.Entities.Impl.UnitClasses
@@ -13,22 +13,22 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         {
             get
             {
-                return 5 * DamageMultiplier;
+                return 9 * DamageMultiplier;
             }
         }
 
         public Necromancer(Race unitRace) : base(unitRace)
         {
-            if (!IsDarkRace && UnitRace == Race.Orc)
+            if (UnitRace != Race.Undead)
             {
                 throw new ArgumentException("Unit Race for class Necromancer could be only Undead.");
             }
         }
 
-        [UnitAction(UnitActionType.Attack)]
+        [UnitAction(UnitActionType.Disease)]
         public void CastDisease(IUnit unit)
         {
-            unit.BecomeDiseased(this);
+            unit.AddBuff(new DiseaseBuff(unit, this));
         }
 
         [UnitAction(UnitActionType.Attack)]

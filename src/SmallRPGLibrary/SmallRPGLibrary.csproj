@@ -42,14 +42,20 @@
   <ItemGroup>
     <Compile Include="Attributes\UnitActionAttribute.cs" />
     <Compile Include="Consts\DefaultValues.cs" />
-    <Compile Include="Entities\Impl\Unit.cs" />
+    <Compile Include="Entities\Impl\Base\UndeadUnit.cs" />
+    <Compile Include="Entities\Impl\Base\Unit.cs" />
+    <Compile Include="Entities\Impl\Buffs\Buff.cs" />
+    <Compile Include="Entities\Impl\Buffs\DiseaseBuff.cs" />
+    <Compile Include="Entities\Impl\Buffs\ImprovementBuff.cs" />
     <Compile Include="Entities\Impl\UnitClasses\CrossBowMan.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Druid.cs" />
     <Compile Include="Entities\Impl\UnitClasses\Necromancer.cs" />
     <Compile Include="Entities\Impl\UnitClasses\RangeUnit.cs" />
     <Compile Include="Entities\Impl\UnitClasses\Shaman.cs" />
     <Compile Include="Entities\Impl\UnitClasses\Warrior.cs" />
     <Compile Include="Entities\Impl\UnitClasses\Wisard.cs" />
-    <Compile Include="Entities\Impl\UnitGroup.cs" />
+    <Compile Include="Entities\Impl\Base\UnitGroup.cs" />
+    <Compile Include="Entities\Interface\IBuffedUnit.cs" />
     <Compile Include="Entities\Interface\ICurseCaster.cs" />
     <Compile Include="Entities\Interface\IDiseaseCaster.cs" />
     <Compile Include="Entities\Interface\IFighter.cs" />
@@ -57,6 +63,7 @@
     <Compile Include="Entities\Interface\IUnitHealer.cs" />
     <Compile Include="Entities\Interface\IUnitImprover.cs" />
     <Compile Include="Entities\Interface\IWisard.cs" />
+    <Compile Include="Enums\LogLevel.cs" />
     <Compile Include="Enums\Race.cs" />
     <Compile Include="Enums\UnitActionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

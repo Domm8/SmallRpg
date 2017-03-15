@@ -23,7 +23,7 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
 
         public Shaman(Race unitRace) : base(unitRace)
         {
-            if (!IsDarkRace && UnitRace == Race.Undead)
+            if (UnitRace != Race.Orc)
             {
                 throw new ArgumentException("Unit Race for class Shaman could be only Orc.");
             }
@@ -32,10 +32,10 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         [UnitAction(UnitActionType.Heal)]
         public void Heal(IUnit unit)
         {
-            unit.Healing(5 * DamageMultiplier, this, "high tide");
+            unit.Healing(7 * DamageMultiplier, this, "High tide");
         }
 
-        [UnitAction(UnitActionType.Attack)]
+        [UnitAction(UnitActionType.Curse)]
         public void CastCurse(IUnit unit)
         {
             unit.BecomeCursed(this);

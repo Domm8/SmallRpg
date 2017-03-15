@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SmallRPGLibrary.Enums;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
@@ -38,7 +39,15 @@ namespace SmallRPGLibrary.Services
 
         public void Log(string message)
         {
+            Log(message, LogLevel.Info);
+            
+        }
+
+        public void Log(string message, LogLevel level)
+        {
+            ChangeColor(level);
             Console.WriteLine(message);
+            Console.ResetColor();
             //File.AppendAllLines(_filePath, new List<string>{ message }, Encoding.Unicode);
             
         }
@@ -58,6 +67,29 @@ namespace SmallRPGLibrary.Services
                 stream.Dispose();
             }
             return logFilePath;
+        }
+
+        private void ChangeColor(LogLevel level)
+        {
+            switch (level)
+            {
+                case LogLevel.Error:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    break;
+                case LogLevel.Heal:
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    break;
+                case LogLevel.Warn:
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    break;
+                case LogLevel.Improve:
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    break;
+                default:
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break;
+            }
+           
         }
     }
 }

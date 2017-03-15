@@ -8,6 +8,8 @@ namespace SmallRPGLibrary.Enums
         Attack = 1,
         HelpBuff = 2,
         Heal = 4,
-        SelfBuff = 8
+        SelfBuff = 8,
+        Curse = 16,
+        Disease = 32
     }
 }
