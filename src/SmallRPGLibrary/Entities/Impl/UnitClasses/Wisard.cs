@@ -33,7 +33,8 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
             get { return "Magic"; }
         }
 
-        public Wisard(Race unitRace) : base(unitRace)
+        public Wisard(Race unitRace, int unitIndex)
+            : base(unitRace, unitIndex)
         {
         }
 

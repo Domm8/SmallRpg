@@ -14,6 +14,7 @@ namespace SmallRPGLibrary.Entities.Interface
         void TakeDamage(double damage, IUnit attacker, string attackName);
         void LooseHealth(double damage, string attackName);
         void Healing(double health, IUnitHealer healer, string healingName);
+        void RestoreHealth(double health, string healingName);
         void BecomeImproved(IUnitImprover caster);
         void BecomeUnImproved();
         void BecomeUnDiseased();

@@ -16,18 +16,18 @@ namespace SmallRPGLibrary.Services
         private const int MEELE_UNIT_COUNT = 2;
         private const int LIST_COUNT = WISARD_UNIT_COUNT + RANGE_UNIT_COUNT + MEELE_UNIT_COUNT;
 
-        private static Unit GetWisardUnit(Race race)
+        private static Unit GetWisardUnit(Race race, int unitIndex)
         {
             switch (race)
             {
                 case Race.Elf:
-                    return new Druid(race);
+                    return new Druid(race, unitIndex);
                 case Race.Human:
-                    return new Wisard(race);
+                    return new Wisard(race, unitIndex);
                 case Race.Orc:
-                    return new Shaman(race);
+                    return new Shaman(race, unitIndex);
                 case Race.Undead:
-                    return new Necromancer(race);
+                    return new Necromancer(race, unitIndex);
             }
             throw new ArgumentException("Trying to create Wisard unit with unknown Race.");
         }
@@ -37,7 +37,7 @@ namespace SmallRPGLibrary.Services
             var wisardUnitCounter = list.Count(u => u is IWisard);
             if (wisardUnitCounter < WISARD_UNIT_COUNT)
             {
-                list.Add(GetWisardUnit(race));
+                list.Add(GetWisardUnit(race, wisardUnitCounter + 1));
                 return true;
             }
             return false;

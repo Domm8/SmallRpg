@@ -42,7 +42,6 @@
   <ItemGroup>
     <Compile Include="Attributes\UnitActionAttribute.cs" />
     <Compile Include="Consts\DefaultValues.cs" />
-    <Compile Include="Entities\Impl\Base\UndeadUnit.cs" />
     <Compile Include="Entities\Impl\Base\Unit.cs" />
     <Compile Include="Entities\Impl\Buffs\Buff.cs" />
     <Compile Include="Entities\Impl\Buffs\DiseaseBuff.cs" />
@@ -55,7 +54,6 @@
     <Compile Include="Entities\Impl\UnitClasses\Warrior.cs" />
     <Compile Include="Entities\Impl\UnitClasses\Wisard.cs" />
     <Compile Include="Entities\Impl\Base\UnitGroup.cs" />
-    <Compile Include="Entities\Interface\IBuffedUnit.cs" />
     <Compile Include="Entities\Interface\ICurseCaster.cs" />
     <Compile Include="Entities\Interface\IDiseaseCaster.cs" />
     <Compile Include="Entities\Interface\IFighter.cs" />

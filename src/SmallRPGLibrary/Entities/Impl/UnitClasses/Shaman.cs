@@ -21,7 +21,8 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
             get { return "Lightning Bolt"; }
         }
 
-        public Shaman(Race unitRace) : base(unitRace)
+        public Shaman(Race unitRace, int unitIndex)
+            : base(unitRace, unitIndex)
         {
             if (UnitRace != Race.Orc)
             {

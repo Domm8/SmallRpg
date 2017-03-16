@@ -17,7 +17,8 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
             }
         }
 
-        public Necromancer(Race unitRace) : base(unitRace)
+        public Necromancer(Race unitRace, int unitIndex)
+            : base(unitRace, unitIndex)
         {
             if (UnitRace != Race.Undead)
             {
@@ -34,7 +35,7 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         [UnitAction(UnitActionType.Attack)]
         public void MagicAttack(IUnit unit)
         {
-            unit.TakeDamage(Damage, this, "magic");
+            unit.TakeDamage(Damage, this, "Plague");
         }
     }
 }

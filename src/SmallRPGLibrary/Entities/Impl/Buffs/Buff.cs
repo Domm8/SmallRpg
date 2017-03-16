@@ -4,15 +4,36 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
 {
     public abstract class Buff
     {
+        #region Private Fields
+
+        private bool _isFinished;
+
+        #endregion
+
+        #region Protected
+
         protected IUnit BuffedUnit;
         protected int LifeTime { get; set; }
+
+        #endregion
+
+        #region Public Fields
 
         public bool IsActive
         {
             get { return LifeTime > 0; }
         }
 
+        public virtual bool IsSingleAtUnit
+        {
+            get { return true; }
+        }
+
         public string Name { get; private set; }
+
+        #endregion
+
+        #region .ctor
 
         protected Buff(IUnit target, int lifetime, string name)
         {
@@ -21,6 +42,10 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
             Name = name;
         }
 
+        #endregion
+
+        #region Public Methods
+
         public void DoFirstBuffing()
         {
             if (IsActive)
@@ -28,10 +53,6 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
                 Action();
             }
         }
-
-        protected abstract void Action();
-        protected abstract void IterationAction();
-        protected abstract void DeactivateAction();
 
         public void NextRound()
         {
@@ -45,7 +66,27 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
         public void Deactivate()
         {
             LifeTime = -1;
-            DeactivateAction();
         }
+
+        public void FinishBuff()
+        {
+            if (_isFinished)
+            {
+                DeactivateAction();
+                _isFinished = true;
+            }
+
+        }
+
+        #endregion
+
+        #region Not Implemented
+
+        protected abstract void Action();
+        protected abstract void IterationAction();
+        protected abstract void DeactivateAction();
+
+        #endregion
+
     }
 }

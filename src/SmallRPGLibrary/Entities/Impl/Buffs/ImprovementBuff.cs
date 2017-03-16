@@ -7,7 +7,7 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
         private readonly IUnitImprover _caster;
 
         public ImprovementBuff(IUnit unit, IUnitImprover caster)
-            : base(unit, 2, "Improvement")
+            : base(unit, 2, "Improve")
         {
             _caster = caster;
             if (_caster is IUnit && ((IUnit)_caster).IsImproved)
