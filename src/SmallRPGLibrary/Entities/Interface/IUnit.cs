@@ -1,5 +1,4 @@
-﻿using SmallRPGLibrary.Entities.Impl.Buffs;
-using SmallRPGLibrary.Enums;
+﻿using SmallRPGLibrary.Enums;
 
 namespace SmallRPGLibrary.Entities.Interface
 {
@@ -7,8 +6,6 @@ namespace SmallRPGLibrary.Entities.Interface
     {
         double Health { get; }
         bool IsLeader { get; }
-        bool IsImproved { get; }
-        bool IsDiseased { get; }
         Race UnitRace { get; }
 
         void TakeDamage(double damage, IUnit attacker, string attackName);
@@ -21,6 +18,7 @@ namespace SmallRPGLibrary.Entities.Interface
         void BecomeCursed(ICurseCaster caster);
         void BecomeDiseased(IDiseaseCaster caster);
         bool IsFrendlyUnit(IUnit unit);
-        void AddBuff(Buff buff);
+        void AddBuff(IBuff buff);
+        bool IsBuffedBy<T>() where T : IBuff;
     }
 }

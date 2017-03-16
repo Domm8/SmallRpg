@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using SmallRPGLibrary.Consts;
+using SmallRPGLibrary.Entities.Impl.Buffs;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using SmallRPGLibrary.Services;
@@ -50,7 +51,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         
         public bool IsSomeBodyImproved()
         {
-            return GetAliveUnits().Any(u => u.IsImproved);
+            return GetAliveUnits().Any(u => u.IsBuffedBy<ImprovementBuff>());
         }
 
         public bool IsNeedHeal()
@@ -65,7 +66,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         public IUnit GetNotImprovedTarget(IFighter attacker)
         {
-            var aliveUnits = GetAliveUnits().Where(f => !f.IsImproved).ToList();
+            var aliveUnits = GetAliveUnits().Where(f => !f.IsBuffedBy<ImprovementBuff>()).ToList();
             return aliveUnits.GetRandomUnit();
         }
 
@@ -76,7 +77,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         public IUnit GetImprovedTarget(IFighter attacker)
         {
-            var improvedUnits = GetAliveUnits().Where(u => u.IsImproved).ToList();
+            var improvedUnits = GetAliveUnits().Where(u => u.IsBuffedBy<ImprovementBuff>()).ToList();
             if (improvedUnits.Count > 0)
             {
                 return improvedUnits.GetRandomUnit();
@@ -86,7 +87,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         public IUnit GetNotDiseasedTarget(IFighter attacker)
         {
-            var notDiseasedUnits = GetAliveUnits().Where(u => !u.IsDiseased).ToList();
+            var notDiseasedUnits = GetAliveUnits().Where(u => !u.IsBuffedBy<DiseaseBuff>()).ToList();
             if (notDiseasedUnits.Count > 0)
             {
                 return notDiseasedUnits.GetRandomUnit();
@@ -148,7 +149,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         private IFighter GetFighter()
         {
             var aliveUnits = GetAliveUnits();
-            var improvedUnits = aliveUnits.Where(u => u.IsImproved).ToList();
+            var improvedUnits = aliveUnits.Where(u => u.IsBuffedBy<ImprovementBuff>()).ToList();
             if (improvedUnits.Count > 0)
             {
                 return improvedUnits.GetRandomUnit();

@@ -2,7 +2,7 @@
 
 namespace SmallRPGLibrary.Entities.Impl.Buffs
 {
-    public abstract class Buff
+    public abstract class Buff : IBuff
     {
         #region Private Fields
 

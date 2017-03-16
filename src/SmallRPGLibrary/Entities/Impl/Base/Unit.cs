@@ -17,24 +17,14 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         #region Fields And Priperties
 
         private double _health;
-        private readonly List<Buff> _buffList;
+        private readonly List<IBuff> _buffList;
         private bool _isLeader;
 
         private int UnitIndex { get; set; }
 
-        public bool IsImproved
-        {
-            get { return _buffList.Exists(b => b is ImprovementBuff); }
-        }
-
         public bool IsLeader
         {
             get { return _isLeader; }
-        }
-
-        public bool IsDiseased
-        {
-            get { return _buffList.Exists(b => b is DiseaseBuff); }
         }
 
         public bool IsAlive
@@ -85,7 +75,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             UnitRace = unitRace;
             DamageMultiplier = 1;
             Health = DefaultValues.UNIT_MAX_HEALTH;
-            _buffList = new List<Buff>();
+            _buffList = new List<IBuff>();
         }
 
         protected Unit(Race unitRace, int unitIndex) : this(unitRace)
@@ -94,6 +84,11 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         }
 
         #endregion
+
+        public bool IsBuffedBy<T>() where T : IBuff
+        {
+            return _buffList.Exists(b => b is T);
+        }
 
         public void FightWith(IUnit unit, UnitActionType actionType)
         {
@@ -186,7 +181,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         public void BecomeImproved(IUnitImprover caster)
         {
-            if (IsAlive && !IsImproved)
+            if (IsAlive && !IsBuffedBy<ImprovementBuff>())
             {
                 GameLogger.Instance.Log(string.Format("{0} was improved by {1}", this, caster), LogLevel.Improve);
                 DamageMultiplier = DamageMultiplier*1.5;
@@ -201,7 +196,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         public void BecomeUnImproved()
         {
-            if (IsAlive && IsImproved)
+            if (IsAlive && IsBuffedBy<ImprovementBuff>())
             {
                 DamageMultiplier = DamageMultiplier/1.5;
             }
@@ -209,7 +204,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         public void BecomeUnDiseased()
         {
-            if (IsAlive && IsDiseased)
+            if (IsAlive && IsBuffedBy<DiseaseBuff>())
             {
                 DamageMultiplier = DamageMultiplier/0.5;
             }
@@ -217,7 +212,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         public void BecomeCursed(ICurseCaster caster)
         {
-            if (IsAlive && IsImproved)
+            if (IsAlive && IsBuffedBy<ImprovementBuff>())
             {
                 _buffList.OfType<ImprovementBuff>().ToList().ForEach(b => b.Deactivate());
                 GameLogger.Instance.Log(string.Format("{0} was cursed by {1}", this, caster), LogLevel.Improve);
@@ -232,7 +227,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         public void BecomeDiseased(IDiseaseCaster caster)
         {
-            if (IsAlive && !IsDiseased)
+            if (IsAlive && !IsBuffedBy<DiseaseBuff>())
             {
                 GameLogger.Instance.Log(string.Format("{0} was diseased by {1}", this, caster), LogLevel.Improve);
                 DamageMultiplier = DamageMultiplier*0.5;
@@ -273,11 +268,11 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             }
         }
 
-        public void AddBuff(Buff buff)
+        public void AddBuff(IBuff buff)
         {
             if (buff.IsSingleAtUnit && _buffList.Any(b => b.GetType() == buff.GetType()))
             {
-                return;
+                return; // added for not buffing unit with the same buff twice
             }
             buff.DoFirstBuffing();
             _buffList.Add(buff);

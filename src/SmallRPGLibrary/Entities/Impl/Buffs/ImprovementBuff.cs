@@ -10,7 +10,7 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
             : base(unit, 2, "Improve")
         {
             _caster = caster;
-            if (_caster is IUnit && ((IUnit)_caster).IsImproved)
+            if (_caster is IUnit && ((IUnit)_caster).IsBuffedBy<ImprovementBuff>())
             {
                 LifeTime *= 2;
             }

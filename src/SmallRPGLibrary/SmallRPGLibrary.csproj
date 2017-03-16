@@ -54,6 +54,7 @@
     <Compile Include="Entities\Impl\UnitClasses\Warrior.cs" />
     <Compile Include="Entities\Impl\UnitClasses\Wisard.cs" />
     <Compile Include="Entities\Impl\Base\UnitGroup.cs" />
+    <Compile Include="Entities\Interface\IBuff.cs" />
     <Compile Include="Entities\Interface\ICurseCaster.cs" />
     <Compile Include="Entities\Interface\IDiseaseCaster.cs" />
     <Compile Include="Entities\Interface\IFighter.cs" />
