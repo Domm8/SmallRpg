@@ -2,7 +2,6 @@
 using SmallRPGLibrary.Entities.Impl.Buffs;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
-using System;
 using SmallRPGLibrary.Attributes;
 
 namespace SmallRPGLibrary.Entities.Impl.UnitClasses

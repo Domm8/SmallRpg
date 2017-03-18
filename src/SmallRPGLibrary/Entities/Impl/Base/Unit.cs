@@ -19,6 +19,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         private double _health;
         private readonly List<IBuff> _buffList;
         private bool _isLeader;
+        private double _multiplier = 1;
 
         private int UnitIndex { get; set; }
 
@@ -59,7 +60,15 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             get { return UnitRace == Race.Orc || UnitRace == Race.Undead; }
         }
 
-        protected double DamageMultiplier { get; set; }
+        protected double DamageMultiplier
+        {
+            get
+            {
+                var multiplier = _multiplier;
+                _buffList.ForEach(b => multiplier = b.DamageMulplier * multiplier);
+                return multiplier;
+            }
+        }
 
         protected virtual string ClassName
         {
@@ -73,8 +82,8 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         protected Unit(Race unitRace)
         {
             UnitRace = unitRace;
-            DamageMultiplier = 1;
             Health = DefaultValues.UNIT_MAX_HEALTH;
+            _multiplier = 1;
             _buffList = new List<IBuff>();
         }
 
@@ -179,37 +188,6 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             }
         }
 
-        public void BecomeImproved(IUnitImprover caster)
-        {
-            if (IsAlive && !IsBuffedBy<ImprovementBuff>())
-            {
-                GameLogger.Instance.Log(string.Format("{0} was improved by {1}", this, caster), LogLevel.Improve);
-                DamageMultiplier = DamageMultiplier*1.5;
-            }
-            else
-            {
-                GameLogger.Instance.Log(
-                    string.Format("{0} can not be improved by {1}, bacause he is already improved or he is dead.", this,
-                                  caster), LogLevel.Warn);
-            }
-        }
-
-        public void BecomeUnImproved()
-        {
-            if (IsAlive && IsBuffedBy<ImprovementBuff>())
-            {
-                DamageMultiplier = DamageMultiplier/1.5;
-            }
-        }
-
-        public void BecomeUnDiseased()
-        {
-            if (IsAlive && IsBuffedBy<DiseaseBuff>())
-            {
-                DamageMultiplier = DamageMultiplier/0.5;
-            }
-        }
-
         public void BecomeCursed(ICurseCaster caster)
         {
             if (IsAlive && IsBuffedBy<ImprovementBuff>())
@@ -225,28 +203,13 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             }
         }
 
-        public void BecomeDiseased(IDiseaseCaster caster)
-        {
-            if (IsAlive && !IsBuffedBy<DiseaseBuff>())
-            {
-                GameLogger.Instance.Log(string.Format("{0} was diseased by {1}", this, caster), LogLevel.Improve);
-                DamageMultiplier = DamageMultiplier*0.5;
-            }
-            else
-            {
-                GameLogger.Instance.Log(
-                    string.Format("{0} can not be diseased by {1}, bacause he is already diseased or he is dead.", this,
-                                  caster), LogLevel.Warn);
-            }
-        }
-
         public void BecomeLeader()
         {
             if (IsAlive && !_isLeader)
             {
                 GameLogger.Instance.Log(string.Format("{0} become a Leader", this));
                 _isLeader = true;
-                DamageMultiplier = DamageMultiplier*1.5;
+                _multiplier = 1.5;
             }
             else
             {

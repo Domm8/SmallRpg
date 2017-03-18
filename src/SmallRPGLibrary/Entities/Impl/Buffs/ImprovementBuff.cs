@@ -1,24 +1,43 @@
 ﻿using SmallRPGLibrary.Entities.Interface;
+using SmallRPGLibrary.Enums;
+using SmallRPGLibrary.Services;
 
 namespace SmallRPGLibrary.Entities.Impl.Buffs
 {
     public class ImprovementBuff : Buff
     {
-        private readonly IUnitImprover _caster;
+        private readonly IUnit _caster;
 
-        public ImprovementBuff(IUnit unit, IUnitImprover caster)
+        public ImprovementBuff(IUnit unit, IUnit caster)
             : base(unit, 2, "Improve")
         {
             _caster = caster;
-            if (_caster is IUnit && ((IUnit)_caster).IsBuffedBy<ImprovementBuff>())
+            if (_caster.IsBuffedBy<ImprovementBuff>())
             {
                 LifeTime *= 2;
             }
         }
 
+        public override double DamageMulplier
+        {
+            get
+            {
+                return 1.5;
+            }
+        }
+
         protected override void Action()
         {
-            BuffedUnit.BecomeImproved(_caster);
+            if (BuffedUnit.IsAlive && !BuffedUnit.IsBuffedBy<ImprovementBuff>())
+            {
+                GameLogger.Instance.Log(string.Format("{0} was improved by {1}", BuffedUnit, _caster), LogLevel.Improve);
+            }
+            else
+            {
+                GameLogger.Instance.Log(
+                    string.Format("{0} can not be improved by {1}, bacause he is already improved or he is dead.", BuffedUnit,
+                                  _caster), LogLevel.Warn);
+            }
         }
 
         protected override void IterationAction()
@@ -27,7 +46,6 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
 
         protected override void DeactivateAction()
         {
-            BuffedUnit.BecomeUnImproved();
         }
     }
 }

@@ -75,7 +75,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
            return GetAliveUnits().OrderBy(u => u.Health).FirstOrDefault();
         }
 
-        public IUnit GetImprovedTarget(IFighter attacker)
+        public IUnit GetImprovedTarget()
         {
             var improvedUnits = GetAliveUnits().Where(u => u.IsBuffedBy<ImprovementBuff>()).ToList();
             if (improvedUnits.Count > 0)
@@ -85,7 +85,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             return null;
         }
 
-        public IUnit GetNotDiseasedTarget(IFighter attacker)
+        public IUnit GetNotDiseasedTarget()
         {
             var notDiseasedUnits = GetAliveUnits().Where(u => !u.IsBuffedBy<DiseaseBuff>()).ToList();
             if (notDiseasedUnits.Count > 0)
@@ -126,7 +126,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         {
             if (UnitAction.Random && attacker is ICurseCaster && opositeGroup.IsSomeBodyImproved())
             {
-                var target = opositeGroup.GetImprovedTarget(attacker);
+                var target = opositeGroup.GetImprovedTarget();
                 if (target != null)
                 {
                     type = UnitActionType.Curse;
@@ -135,7 +135,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             }
             if (UnitAction.Random && attacker is IDiseaseCaster)
             {
-                var target = opositeGroup.GetNotDiseasedTarget(attacker);
+                var target = opositeGroup.GetNotDiseasedTarget();
                 if (target != null)
                 {
                     type = UnitActionType.Disease;

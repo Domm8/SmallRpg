@@ -5,6 +5,7 @@
         bool IsActive { get; }
         bool IsSingleAtUnit { get; }
         string Name { get; }
+        double DamageMulplier { get; }
 
         void DoFirstBuffing();
         void NextRound();

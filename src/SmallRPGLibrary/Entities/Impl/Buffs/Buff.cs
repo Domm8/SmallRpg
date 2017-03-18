@@ -29,6 +29,11 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
             get { return true; }
         }
 
+        public virtual double DamageMulplier
+        {
+            get { return 1; }
+        }
+
         public string Name { get; private set; }
 
         #endregion
