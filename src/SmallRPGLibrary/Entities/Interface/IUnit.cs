@@ -1,4 +1,5 @@
-﻿using SmallRPGLibrary.Enums;
+﻿using System;
+using SmallRPGLibrary.Enums;
 
 namespace SmallRPGLibrary.Entities.Interface
 {
@@ -13,9 +14,10 @@ namespace SmallRPGLibrary.Entities.Interface
         void LooseHealth(double damage, string attackName);
         void Healing(double health, IUnitHealer healer, string healingName);
         void RestoreHealth(double health, string healingName);
-        void BecomeCursed(ICurseCaster caster);
+        bool DeactivateBuff(Type buffType);
         bool IsFrendlyUnit(IUnit unit);
         void AddBuff(IBuff buff);
         bool IsBuffedBy<T>() where T : IBuff;
+        bool IsBuffedBy(Type buffType);
     }
 }

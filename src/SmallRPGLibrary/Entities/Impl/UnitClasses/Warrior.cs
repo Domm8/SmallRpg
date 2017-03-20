@@ -32,6 +32,18 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
             }
         }
 
+        public override Characteristics Characteristics
+        {
+            get
+            {
+                return new Characteristics
+                {
+                    Stamina = 30,
+                    Speed = 2,
+                };
+            }
+        }
+
         protected override string ClassName
         {
             get

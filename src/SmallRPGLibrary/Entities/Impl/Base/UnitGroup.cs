@@ -5,38 +5,60 @@ using SmallRPGLibrary.Entities.Impl.Buffs;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using SmallRPGLibrary.Services;
+using SmallRPGLibrary.Services.Interfaces;
 
 namespace SmallRPGLibrary.Entities.Impl.Base
 {
     public class UnitGroup
     {
         private readonly List<Unit> _units;
+        private readonly IUnitFactory _unitFactory;
         private Race Race { get; set; }
 
         public UnitGroup(Race race)
         {
             Race = race;
-            _units = UnitFactory.GetGroupUnits(race);
+            _unitFactory = UnitFactoryBuilder.Create();
+            _units = _unitFactory.GetGroupUnits(race);
             _units.SelectLider();
         }
 
-        public void StartFighting(UnitGroup unitGroup)
+        public void StartRandomFighting(UnitGroup unitGroup)
         {
             GameLogger.Instance.Log(string.Format("\nStart Fighting! {0} VS {1}!", this, unitGroup));
+
             while (IsSomeBodyAlive() && unitGroup.IsSomeBodyAlive())
             {
-                FightOrHelp(GetFighter(), unitGroup, this);
-
-                //Console.ReadLine();
+                FightOrHelp(GetRandomFighter(), unitGroup, this);
                 if (unitGroup.IsSomeBodyAlive())
                 {
-                    FightOrHelp(unitGroup.GetFighter(), this, unitGroup);
-                    //Console.ReadLine();
+                    FightOrHelp(unitGroup.GetRandomFighter(), this, unitGroup);
                 }
             }
-            var winner = IsSomeBodyAlive() ? this : unitGroup;
-            GameLogger.Instance.Log(string.Format("{0} is the winner!", winner));
-            GameLogger.Instance.Log(winner.GetAliveUnits().PrintUnits());
+            SelectWinner(this, unitGroup);
+        }
+
+        public void StartOrderedFighting(UnitGroup unitGroup)
+        {
+            GameLogger.Instance.Log(string.Format("\nStart Fighting! {0} VS {1}!", this, unitGroup));
+
+            while (IsSomeBodyAlive() && unitGroup.IsSomeBodyAlive())
+            {
+                FightOrHelp(GetNextFighter(), unitGroup, this);
+
+                if (unitGroup.IsSomeBodyAlive())
+                {
+                    FightOrHelp(unitGroup.GetNextFighter(), this, unitGroup);
+                }
+
+                if (unitGroup.IsRoundComplete() && IsRoundComplete())
+                {
+                    
+
+                }
+            }
+
+            SelectWinner(this, unitGroup);
         }
 
         public override string ToString()
@@ -47,6 +69,11 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         public bool IsSomeBodyAlive()
         {
            return GetAliveUnits().Any();
+        }
+
+        public bool IsRoundComplete()
+        {
+           return !GetAliveUnits().Any(u => u.CanMove);
         }
         
         public bool IsSomeBodyImproved()
@@ -62,6 +89,11 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         public IUnit GetTarget()
         {
             return GetAliveUnits().GetRandomUnit();
+        }
+
+        public void ToNextRound()
+        {
+            //_units.ForEach(u => u.);
         }
 
         public IUnit GetNotImprovedTarget(IFighter attacker)
@@ -146,7 +178,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             return opositeGroup.GetTarget();
         }
 
-        private IFighter GetFighter()
+        private IFighter GetRandomFighter()
         {
             var aliveUnits = GetAliveUnits();
             var improvedUnits = aliveUnits.Where(u => u.IsBuffedBy<ImprovementBuff>()).ToList();
@@ -155,6 +187,24 @@ namespace SmallRPGLibrary.Entities.Impl.Base
                 return improvedUnits.GetRandomUnit();
             }
             return aliveUnits.GetRandomUnit();
+        }
+
+        public IFighter GetNextFighter()
+        {
+            var aliveUnits = GetAliveUnits().Where(u => u.CanMove);
+            var improvedUnits = aliveUnits.Where(u => u.IsBuffedBy<ImprovementBuff>()).ToList();
+            if (improvedUnits.Count > 0)
+            {
+                return improvedUnits.OrderBy(u => u.Characteristics.Speed).FirstOrDefault();
+            }
+            return aliveUnits.OrderBy(u => u.Characteristics.Speed).FirstOrDefault();
+        }
+
+        private static void SelectWinner(UnitGroup firstGroup, UnitGroup secondGroup)
+        {
+            var winner = firstGroup.IsSomeBodyAlive() ? firstGroup : secondGroup;
+            GameLogger.Instance.Log(string.Format("{0} is the winner!", winner));
+            GameLogger.Instance.Log(winner.GetAliveUnits().PrintUnits());
         }
 
         private List<Unit> GetAliveUnits()

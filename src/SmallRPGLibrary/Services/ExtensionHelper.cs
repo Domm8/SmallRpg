@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SmallRPGLibrary.Consts;
 using SmallRPGLibrary.Entities.Impl.Base;
+using SmallRPGLibrary.Entities.Impl.UnitClasses;
 using SmallRPGLibrary.Entities.Interface;
+using SmallRPGLibrary.Enums;
 
 namespace SmallRPGLibrary.Services
 {
@@ -26,6 +29,59 @@ namespace SmallRPGLibrary.Services
             {
                 list.ToList().GetRandomUnit().BecomeLeader();
             }
+        }
+
+
+        public static Unit GetWisardUnit(Race race, int unitIndex)
+        {
+            switch (race)
+            {
+                case Race.Elf:
+                    return new Druid(race, unitIndex);
+                case Race.Human:
+                    return new Wisard(race, unitIndex);
+                case Race.Orc:
+                    return new Shaman(race, unitIndex);
+                case Race.Undead:
+                    return new Necromancer(race, unitIndex);
+            }
+            throw new ArgumentException("Trying to create Wisard unit with unknown Race.");
+        }
+
+        public static bool AddWisardUnit(this ICollection<Unit> list, Race race)
+        {
+            var wisardUnitCounter = list.Count(u => u is IWisard);
+            if (wisardUnitCounter < DefaultValues.WISARD_UNIT_COUNT)
+            {
+                list.Add(GetWisardUnit(race, wisardUnitCounter + 1));
+                return true;
+            }
+            return false;
+        }
+
+        public static bool AddRangeUnit(this ICollection<Unit> list, Race race)
+        {
+            var rangeUnitCounter = list.Count(u => u is RangeUnit);
+            if (rangeUnitCounter < DefaultValues.RANGE_UNIT_COUNT)
+            {
+                list.Add(race == Race.Human ?
+                    new CrossBowMan(race, rangeUnitCounter + 1) :
+                    new RangeUnit(race, rangeUnitCounter + 1));
+
+                return true;
+            }
+            return false;
+        }
+
+        public static bool AddMeeleUnit(this ICollection<Unit> list, Race race)
+        {
+            var meeleUnitCounter = list.Count(u => u is Warrior);
+            if (meeleUnitCounter < DefaultValues.MEELE_UNIT_COUNT)
+            {
+                list.Add(new Warrior(race, meeleUnitCounter + 1));
+                return true;
+            }
+            return false;
         }
 
         public static Unit GetRandomUnit(this List<Unit> list)

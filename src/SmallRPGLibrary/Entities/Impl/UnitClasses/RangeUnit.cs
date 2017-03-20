@@ -1,5 +1,4 @@
-﻿using System;
-using SmallRPGLibrary.Entities.Impl.Base;
+﻿using SmallRPGLibrary.Entities.Impl.Base;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using SmallRPGLibrary.Attributes;
@@ -51,6 +50,18 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
                         break;
                 }
                 return damage * DamageMultiplier;
+            }
+        }
+
+        public override Characteristics Characteristics
+        {
+            get
+            {
+                return new Characteristics
+                {
+                    Stamina = 1,
+                    Speed = 10,
+                };
             }
         }
 

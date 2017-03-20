@@ -8,6 +8,14 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
     [UnitAction(UnitActionType.Heal)]
     public class Druid : Wisard, IUnitHealer
     {
+        protected override double Damage
+        {
+            get
+            {
+                return 10 * DamageMultiplier;
+            }
+        }
+
         public Druid(Race unitRace, int unitIndex) : base(unitRace, unitIndex)
         {
             if (UnitRace != Race.Elf)

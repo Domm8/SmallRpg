@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Attributes\UnitActionAttribute.cs" />
     <Compile Include="Consts\DefaultValues.cs" />
+    <Compile Include="Entities\Impl\Base\Characteristics.cs" />
     <Compile Include="Entities\Impl\Base\Unit.cs" />
     <Compile Include="Entities\Impl\Buffs\Buff.cs" />
     <Compile Include="Entities\Impl\Buffs\DiseaseBuff.cs" />
@@ -68,8 +69,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\GameLogger.cs" />
     <Compile Include="Services\ExtensionHelper.cs" />
+    <Compile Include="Services\Interfaces\IUnitFactory.cs" />
     <Compile Include="Services\UnitAction.cs" />
     <Compile Include="Services\UnitFactory.cs" />
+    <Compile Include="Services\UnitFactoryBuilder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

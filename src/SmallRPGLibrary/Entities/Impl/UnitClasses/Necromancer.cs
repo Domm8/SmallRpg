@@ -17,6 +17,18 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
             }
         }
 
+        public override Characteristics Characteristics
+        {
+            get
+            {
+                return new Characteristics
+                {
+                    Stamina = 1,
+                    Speed = 5,
+                };
+            }
+        }
+
         public Necromancer(Race unitRace, int unitIndex)
             : base(unitRace, unitIndex)
         {

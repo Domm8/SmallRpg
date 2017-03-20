@@ -12,7 +12,7 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
             : base(unit, 2, "Improve")
         {
             _caster = caster;
-            if (_caster.IsBuffedBy<ImprovementBuff>())
+            if (_caster.IsBuffedBy(GetType()))
             {
                 LifeTime *= 2;
             }
@@ -22,7 +22,7 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
         {
             get
             {
-                return 1.5;
+                return 1.4;
             }
         }
 

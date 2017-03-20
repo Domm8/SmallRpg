@@ -1,7 +1,9 @@
-﻿using SmallRPGLibrary.Entities.Interface;
+﻿using SmallRPGLibrary.Entities.Impl.Buffs;
+using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using System;
 using SmallRPGLibrary.Attributes;
+using SmallRPGLibrary.Services;
 
 namespace SmallRPGLibrary.Entities.Impl.UnitClasses
 {
@@ -39,7 +41,16 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         [UnitAction(UnitActionType.Curse)]
         public void CastCurse(IUnit unit)
         {
-            unit.BecomeCursed(this);
+            if (unit.DeactivateBuff(typeof (ImprovementBuff)))
+            {
+                GameLogger.Instance.Log(string.Format("{0} was cursed by {1}", unit, this), LogLevel.Improve);
+            }
+            else
+            {
+                GameLogger.Instance.Log(
+                    string.Format("{0} can not be cursed by {1}, bacause he is not improved or he is dead.", unit,
+                                  this), LogLevel.Warn);
+            }
         }
     }
 }

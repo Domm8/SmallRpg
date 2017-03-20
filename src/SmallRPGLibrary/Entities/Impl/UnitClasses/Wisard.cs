@@ -13,23 +13,25 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         {
             get
             {
-                var damage = 4;
-                switch (UnitRace)
-                {
-                    case Race.Elf:
-                        damage = 10;
-                        break;
-                    case Race.Human:
-                        damage = 6;
-                        break;
-                }
-                return damage * DamageMultiplier;
+                return 8 * DamageMultiplier;
             }
         }
 
         protected virtual string MagicAttackName
         {
             get { return "Magic"; }
+        }
+
+        public override Characteristics Characteristics
+        {
+            get
+            {
+                return new Characteristics
+                {
+                    Stamina = 1,
+                    Speed = 5,
+                };
+            }
         }
 
         public Wisard(Race unitRace, int unitIndex)

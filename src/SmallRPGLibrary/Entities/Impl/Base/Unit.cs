@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using SmallRPGLibrary.Consts;
-using SmallRPGLibrary.Entities.Impl.Buffs;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using SmallRPGLibrary.Services;
@@ -16,12 +15,24 @@ namespace SmallRPGLibrary.Entities.Impl.Base
     {
         #region Fields And Priperties
 
+        #region Private
+
         private double _health;
+
+        private double MaxHealth
+        {
+            get { return DefaultValues.UNIT_MAX_HEALTH + Characteristics.Stamina/6; }
+        }
+
         private readonly List<IBuff> _buffList;
+
         private bool _isLeader;
+
         private double _multiplier = 1;
 
         private int UnitIndex { get; set; }
+
+        #endregion
 
         public bool IsLeader
         {
@@ -38,13 +49,13 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             get { return _health; }
             private set
             {
-                if (value <= DefaultValues.UNIT_MAX_HEALTH && value > 0)
+                if (value <= MaxHealth && value > 0)
                 {
                     _health = value;
                 }
-                else if (value > DefaultValues.UNIT_MAX_HEALTH)
+                else if (value > MaxHealth)
                 {
-                    _health = DefaultValues.UNIT_MAX_HEALTH;
+                    _health = MaxHealth;
                 }
                 else
                 {
@@ -54,6 +65,10 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         }
 
         public Race UnitRace { get; private set; }
+
+        public bool CanMove { get; private set; }
+
+        public abstract Characteristics Characteristics { get; }
 
         protected bool IsDarkRace
         {
@@ -82,7 +97,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         protected Unit(Race unitRace)
         {
             UnitRace = unitRace;
-            Health = DefaultValues.UNIT_MAX_HEALTH;
+            Health = MaxHealth;
             _multiplier = 1;
             _buffList = new List<IBuff>();
         }
@@ -97,6 +112,11 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         public bool IsBuffedBy<T>() where T : IBuff
         {
             return _buffList.Exists(b => b is T);
+        }
+
+        public bool IsBuffedBy(Type buffType) 
+        {
+            return _buffList.Exists(buffType.IsInstanceOfType);
         }
 
         public void FightWith(IUnit unit, UnitActionType actionType)
@@ -188,19 +208,15 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             }
         }
 
-        public void BecomeCursed(ICurseCaster caster)
+        public bool DeactivateBuff(Type buffType)
         {
-            if (IsAlive && IsBuffedBy<ImprovementBuff>())
+            if (IsAlive && IsBuffedBy(buffType))
             {
-                _buffList.OfType<ImprovementBuff>().ToList().ForEach(b => b.Deactivate());
-                GameLogger.Instance.Log(string.Format("{0} was cursed by {1}", this, caster), LogLevel.Improve);
+                _buffList.Where(buffType.IsInstanceOfType).ToList().ForEach(b => b.Deactivate());
+                _buffList.RemoveAll(buffType.IsInstanceOfType);
+                return true;
             }
-            else
-            {
-                GameLogger.Instance.Log(
-                    string.Format("{0} can not be cursed by {1}, bacause he is not improved or he is dead.", this,
-                                  caster), LogLevel.Warn);
-            }
+            return false;
         }
 
         public void BecomeLeader()
@@ -209,7 +225,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             {
                 GameLogger.Instance.Log(string.Format("{0} become a Leader", this));
                 _isLeader = true;
-                _multiplier = 1.5;
+                _multiplier = 1.15;
             }
             else
             {
@@ -284,6 +300,8 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         }
 
+        #region ToString
+
         public override string ToString()
         {
             return ToString("G");
@@ -310,6 +328,8 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             }
             return UnitToString();
         }
+
+        #endregion
 
         #region Private Methods
 
