@@ -18,11 +18,11 @@ namespace SmallRPGConsole
             var firstAttackFirst = random.Next(0, 100) > 49;
             if (firstAttackFirst)
             {
-                firstGroup.StartRandomFighting(secondGroup);
+                firstGroup.StartOrderedFighting(secondGroup);
             }
             else
             {
-                secondGroup.StartRandomFighting(firstGroup);
+                secondGroup.StartOrderedFighting(firstGroup);
             }
 
             Console.ReadKey();

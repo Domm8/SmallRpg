@@ -19,9 +19,9 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         private double _health;
 
-        private double MaxHealth
+        private int MaxHealth
         {
-            get { return DefaultValues.UNIT_MAX_HEALTH + Characteristics.Stamina/6; }
+            get { return (int)(DefaultValues.UNIT_MAX_HEALTH + Characteristics.Stamina/6); }
         }
 
         private readonly List<IBuff> _buffList;
@@ -99,6 +99,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             UnitRace = unitRace;
             Health = MaxHealth;
             _multiplier = 1;
+            CanMove = true;
             _buffList = new List<IBuff>();
         }
 
@@ -119,22 +120,11 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             return _buffList.Exists(buffType.IsInstanceOfType);
         }
 
-        public void FightWith(IUnit unit, UnitActionType actionType)
+        public void DoRandomActionByType(IUnit unit, UnitActionType actionType)
         {
             RemoveUnActiveBuffs();
             InvokeUnitAction(actionType, unit);
-        }
-
-        public void HelpTo(IUnit unit)
-        {
-            RemoveUnActiveBuffs();
-            InvokeUnitAction(UnitActionType.HelpBuff, unit);
-        }
-
-        public void HealUnit(IUnit unit)
-        {
-            RemoveUnActiveBuffs();
-            InvokeUnitAction(UnitActionType.Heal, unit);
+            CanMove = false;
         }
 
         #region Public State change Methods
@@ -271,6 +261,11 @@ namespace SmallRPGLibrary.Entities.Impl.Base
                     .Any(ua => ua.UnitActionType.HasAnyFlag(UnitActionType.Heal));
         }
 
+        public void ToNextRound()
+        {
+            CanMove = true;
+        }
+
         private void InvokeUnitAction(UnitActionType actionType, IUnit unit)
         {
             var methodInfos = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
@@ -342,7 +337,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
                                  leaderText);
         }
 
-        private void ToNextRound()
+        private void IterateBuffs()
         {
             _buffList.ForEach(b =>
                 {
@@ -363,7 +358,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
                     }
                 });
             _buffList.RemoveAll(b => !b.IsActive);
-            ToNextRound();
+            IterateBuffs();
         }
 
         #endregion

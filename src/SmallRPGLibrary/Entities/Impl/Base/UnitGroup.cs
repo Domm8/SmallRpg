@@ -5,21 +5,18 @@ using SmallRPGLibrary.Entities.Impl.Buffs;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using SmallRPGLibrary.Services;
-using SmallRPGLibrary.Services.Interfaces;
 
 namespace SmallRPGLibrary.Entities.Impl.Base
 {
     public class UnitGroup
     {
         private readonly List<Unit> _units;
-        private readonly IUnitFactory _unitFactory;
         private Race Race { get; set; }
 
         public UnitGroup(Race race)
         {
             Race = race;
-            _unitFactory = UnitFactoryBuilder.Create();
-            _units = _unitFactory.GetGroupUnits(race);
+            _units = UnitFactoryBuilder.Create().GetGroupUnits(race);
             _units.SelectLider();
         }
 
@@ -30,10 +27,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             while (IsSomeBodyAlive() && unitGroup.IsSomeBodyAlive())
             {
                 FightOrHelp(GetRandomFighter(), unitGroup, this);
-                if (unitGroup.IsSomeBodyAlive())
-                {
-                    FightOrHelp(unitGroup.GetRandomFighter(), this, unitGroup);
-                }
+                FightOrHelp(unitGroup.GetRandomFighter(), this, unitGroup);
             }
             SelectWinner(this, unitGroup);
         }
@@ -45,16 +39,13 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             while (IsSomeBodyAlive() && unitGroup.IsSomeBodyAlive())
             {
                 FightOrHelp(GetNextFighter(), unitGroup, this);
-
-                if (unitGroup.IsSomeBodyAlive())
-                {
-                    FightOrHelp(unitGroup.GetNextFighter(), this, unitGroup);
-                }
+                FightOrHelp(unitGroup.GetNextFighter(), this, unitGroup);
 
                 if (unitGroup.IsRoundComplete() && IsRoundComplete())
                 {
-                    
-
+                    ToNextRound();
+                    unitGroup.ToNextRound();
+                    GameLogger.Instance.Log("Next Round!");
                 }
             }
 
@@ -93,10 +84,10 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         public void ToNextRound()
         {
-            //_units.ForEach(u => u.);
+            GetAliveUnits().ForEach(u => u.ToNextRound());
         }
 
-        public IUnit GetNotImprovedTarget(IFighter attacker)
+        public IUnit GetNotImprovedTarget()
         {
             var aliveUnits = GetAliveUnits().Where(f => !f.IsBuffedBy<ImprovementBuff>()).ToList();
             return aliveUnits.GetRandomUnit();
@@ -129,28 +120,32 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         private static void FightOrHelp(IFighter fighter, UnitGroup opositeGroup, UnitGroup currentGroup)
         {
+            if (fighter == null)
+            {
+                return;
+            }
             if (UnitAction.Random && fighter.IsHelpfull())
             {
-                var target = currentGroup.GetNotImprovedTarget(fighter);
+                var target = currentGroup.GetNotImprovedTarget();
                 if (target != null)
                 {
-                    fighter.HelpTo(target);
+                    fighter.DoRandomActionByType(target, UnitActionType.HelpBuff);
                     return;
                 }
             }
             if (UnitAction.Random)
             {
                 UnitActionType type;
-                fighter.FightWith(GetTarget(fighter, opositeGroup, out type), type);
+                fighter.DoRandomActionByType(GetTarget(fighter, opositeGroup, out type), type);
             }
             else if (fighter.IsHealer() && currentGroup.IsNeedHeal())
             {
-                fighter.HealUnit(currentGroup.GetTargetWithLowerHealth());
+                fighter.DoRandomActionByType(currentGroup.GetTargetWithLowerHealth(), UnitActionType.Heal);
             }
             else
             {
                 UnitActionType type;
-                fighter.FightWith(GetTarget(fighter, opositeGroup, out type), type);
+                fighter.DoRandomActionByType(GetTarget(fighter, opositeGroup, out type), type);
             }
         }
 
@@ -195,9 +190,9 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             var improvedUnits = aliveUnits.Where(u => u.IsBuffedBy<ImprovementBuff>()).ToList();
             if (improvedUnits.Count > 0)
             {
-                return improvedUnits.OrderBy(u => u.Characteristics.Speed).FirstOrDefault();
+                return improvedUnits.OrderByDescending(u => u.Characteristics.Speed).FirstOrDefault();
             }
-            return aliveUnits.OrderBy(u => u.Characteristics.Speed).FirstOrDefault();
+            return aliveUnits.OrderByDescending(u => u.Characteristics.Speed).FirstOrDefault();
         }
 
         private static void SelectWinner(UnitGroup firstGroup, UnitGroup secondGroup)
