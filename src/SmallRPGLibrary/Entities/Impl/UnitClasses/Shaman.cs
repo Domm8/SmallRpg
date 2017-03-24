@@ -3,24 +3,18 @@ using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using System;
 using SmallRPGLibrary.Attributes;
+using SmallRPGLibrary.Entities.Impl.Base;
+using SmallRPGLibrary.Entities.Impl.UnitFeatures;
 using SmallRPGLibrary.Services;
 
 namespace SmallRPGLibrary.Entities.Impl.UnitClasses
 {
     [UnitAction(UnitActionType.Heal)]
-    public class Shaman : Wisard, ICurseCaster, IUnitHealer
+    public class Shaman : Wizard, ICurseCaster, IUnitHealer
     {
-        protected override double Damage
+        protected override AttackParameters MagicAttackParams
         {
-            get
-            {
-                return 4 * DamageMultiplier;
-            }
-        }
-
-        protected override string MagicAttackName
-        {
-            get { return "Lightning Bolt"; }
+            get { return new AttackParameters("Lightning Bolt", 4); }
         }
 
         public Shaman(Race unitRace, int unitIndex)
@@ -35,7 +29,7 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         [UnitAction(UnitActionType.Heal)]
         public void Heal(IUnit unit)
         {
-            unit.Healing(7 * DamageMultiplier, this, "High tide");
+            unit.RestoreHealth(7 * DamageMultiplier, this, "High tide");
         }
 
         [UnitAction(UnitActionType.Curse)]

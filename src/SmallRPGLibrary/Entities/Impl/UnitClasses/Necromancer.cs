@@ -4,20 +4,21 @@ using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using System;
 using SmallRPGLibrary.Attributes;
+using SmallRPGLibrary.Entities.Impl.UnitFeatures;
 
 namespace SmallRPGLibrary.Entities.Impl.UnitClasses
 {
-    public class Necromancer : Unit, IDiseaseCaster, IWisard
+    public class Necromancer : Unit, IDiseaseCaster, IWizard
     {
         private double Damage
         {
             get
             {
-                return 9 * DamageMultiplier;
+                return CountUnitAttackDamage(9);
             }
         }
 
-        public override Characteristics Characteristics
+        protected override Characteristics Characteristics
         {
             get
             {

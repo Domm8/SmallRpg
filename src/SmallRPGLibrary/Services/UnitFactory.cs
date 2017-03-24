@@ -11,6 +11,7 @@ namespace SmallRPGLibrary.Services
     {
         public List<Unit> GetGroupUnits(Race race)
         {
+            var unitBuilder = UnitBuilderCreator.Create(race);
             var unitList = new List<Unit>();
             var rangeSuccess = true;
             var wisardSuccess = true;
@@ -20,15 +21,15 @@ namespace SmallRPGLibrary.Services
                 var random = new Random().Next(1, 4);
                 if (rangeSuccess && (random == 1 || (!wisardSuccess && !meeleSuccess)))
                 {
-                    rangeSuccess = unitList.AddRangeUnit(race);
+                    rangeSuccess = unitBuilder.AddRangeUnit(unitList);
                 }
                 if (meeleSuccess && (random == 2 || (!rangeSuccess && !wisardSuccess)))
                 {
-                    meeleSuccess = unitList.AddMeeleUnit(race);
+                    meeleSuccess = unitBuilder.AddMeleeUnit(unitList);
                 }
                 if (wisardSuccess && (random == 3 || (!rangeSuccess && !meeleSuccess)))
                 {
-                    wisardSuccess = unitList.AddWisardUnit(race);
+                    wisardSuccess = unitBuilder.AddWisardUnit(unitList);
                 }
             }
 

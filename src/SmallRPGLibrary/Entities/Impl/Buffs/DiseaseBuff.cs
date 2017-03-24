@@ -1,4 +1,5 @@
-﻿using SmallRPGLibrary.Entities.Interface;
+﻿using SmallRPGLibrary.Entities.Impl.UnitFeatures;
+using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using SmallRPGLibrary.Services;
 
@@ -14,11 +15,11 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
             _diseaseCaster = caster;
         }
 
-        public override double DamageMulplier
+        public override BuffCharacteristics Characteristics
         {
             get
             {
-                return 0.5;
+                return base.Characteristics + new BuffCharacteristics { DamageMultiplier = 0.5 };
             }
         }
 
@@ -38,7 +39,7 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
 
         protected override void IterationAction()
         {
-            BuffedUnit.LooseHealth(1, "Disease Tic");
+            BuffedUnit.TakeDamage(1, "Disease Tic");
         }
 
         protected override void DeactivateAction()

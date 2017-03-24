@@ -1,4 +1,5 @@
-﻿using SmallRPGLibrary.Entities.Interface;
+﻿using SmallRPGLibrary.Entities.Impl.UnitFeatures;
+using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using SmallRPGLibrary.Services;
 
@@ -18,13 +19,14 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
             }
         }
 
-        public override double DamageMulplier
+        public override BuffCharacteristics Characteristics
         {
             get
             {
-                return 1.4;
+                return base.Characteristics + new BuffCharacteristics { DamageMultiplier = 1.4, HealMultiplier = 1.5};
             }
         }
+
 
         protected override void Action()
         {

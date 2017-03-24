@@ -1,11 +1,13 @@
-﻿namespace SmallRPGLibrary.Entities.Interface
+﻿using SmallRPGLibrary.Entities.Impl.UnitFeatures;
+
+namespace SmallRPGLibrary.Entities.Interface
 {
     public interface IBuff
     {
         bool IsActive { get; }
         bool IsSingleAtUnit { get; }
         string Name { get; }
-        double DamageMulplier { get; }
+        BuffCharacteristics Characteristics { get; }
 
         void DoFirstBuffing();
         void NextRound();

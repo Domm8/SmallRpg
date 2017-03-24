@@ -42,19 +42,31 @@
   <ItemGroup>
     <Compile Include="Attributes\UnitActionAttribute.cs" />
     <Compile Include="Consts\DefaultValues.cs" />
-    <Compile Include="Entities\Impl\Base\Characteristics.cs" />
+    <Compile Include="Entities\Impl\Buffs\HarmfulBuff.cs" />
+    <Compile Include="Entities\Impl\Buffs\SimpleBuff.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Berserk.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\DeathKnight.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Paladin.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Range\AxeThrower.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Range\Hunter.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Mage.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Range\UndeadBowman.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Warrior.cs" />
+    <Compile Include="Entities\Impl\UnitFeatures\AttackParameters.cs" />
+    <Compile Include="Entities\Impl\UnitFeatures\Characteristics.cs" />
     <Compile Include="Entities\Impl\Base\Unit.cs" />
     <Compile Include="Entities\Impl\Buffs\Buff.cs" />
     <Compile Include="Entities\Impl\Buffs\DiseaseBuff.cs" />
     <Compile Include="Entities\Impl\Buffs\ImprovementBuff.cs" />
-    <Compile Include="Entities\Impl\UnitClasses\CrossBowMan.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Range\CrossBowMan.cs" />
     <Compile Include="Entities\Impl\UnitClasses\Druid.cs" />
     <Compile Include="Entities\Impl\UnitClasses\Necromancer.cs" />
-    <Compile Include="Entities\Impl\UnitClasses\RangeUnit.cs" />
+    <Compile Include="Entities\Impl\Base\RangeUnit.cs" />
     <Compile Include="Entities\Impl\UnitClasses\Shaman.cs" />
-    <Compile Include="Entities\Impl\UnitClasses\Warrior.cs" />
-    <Compile Include="Entities\Impl\UnitClasses\Wisard.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\MeleeUnit.cs" />
+    <Compile Include="Entities\Impl\Base\Wizard.cs" />
     <Compile Include="Entities\Impl\Base\UnitGroup.cs" />
+    <Compile Include="Entities\Impl\UnitFeatures\BuffCharacteristics.cs" />
     <Compile Include="Entities\Interface\IBuff.cs" />
     <Compile Include="Entities\Interface\ICurseCaster.cs" />
     <Compile Include="Entities\Interface\IDiseaseCaster.cs" />
@@ -62,7 +74,7 @@
     <Compile Include="Entities\Interface\IUnit.cs" />
     <Compile Include="Entities\Interface\IUnitHealer.cs" />
     <Compile Include="Entities\Interface\IUnitImprover.cs" />
-    <Compile Include="Entities\Interface\IWisard.cs" />
+    <Compile Include="Entities\Interface\IWizard.cs" />
     <Compile Include="Enums\LogLevel.cs" />
     <Compile Include="Enums\Race.cs" />
     <Compile Include="Enums\UnitActionType.cs" />
@@ -71,8 +83,15 @@
     <Compile Include="Services\ExtensionHelper.cs" />
     <Compile Include="Services\Interfaces\IUnitFactory.cs" />
     <Compile Include="Services\UnitAction.cs" />
+    <Compile Include="Services\UnitBuilderCreator.cs" />
+    <Compile Include="Services\UnitBuilders\BaseUnitBuilder.cs" />
+    <Compile Include="Services\UnitBuilders\ElfUnitBuilder.cs" />
+    <Compile Include="Services\UnitBuilders\HumanUnitBuilder.cs" />
+    <Compile Include="Services\UnitBuilders\IUnitBuilder.cs" />
+    <Compile Include="Services\UnitBuilders\OrcUnitBuilder.cs" />
+    <Compile Include="Services\UnitBuilders\UndeadUnitBuilder.cs" />
     <Compile Include="Services\UnitFactory.cs" />
-    <Compile Include="Services\UnitFactoryBuilder.cs" />
+    <Compile Include="Services\UnitFactoryCreator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

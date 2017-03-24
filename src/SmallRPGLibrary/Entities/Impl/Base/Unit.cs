@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using SmallRPGLibrary.Attributes;
+using SmallRPGLibrary.Entities.Impl.UnitFeatures;
 
 namespace SmallRPGLibrary.Entities.Impl.Base
 {
@@ -21,10 +22,10 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         private int MaxHealth
         {
-            get { return (int)(DefaultValues.UNIT_MAX_HEALTH + Characteristics.Stamina/6); }
+            get { return (int)(DefaultValues.UNIT_MAX_HEALTH + FullCharacteristics.Stamina / 6); }
         }
 
-        private readonly List<IBuff> _buffList;
+        private readonly List<IBuff> _buffList = new List<IBuff>();
 
         private bool _isLeader;
 
@@ -68,7 +69,17 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         public bool CanMove { get; private set; }
 
-        public abstract Characteristics Characteristics { get; }
+        protected abstract Characteristics Characteristics { get; }
+
+        public Characteristics FullCharacteristics
+        {
+            get
+            {
+                var buffCharacteristics = Characteristics ?? new Characteristics();
+                _buffList.ForEach(b => buffCharacteristics = buffCharacteristics + b.Characteristics);
+                return buffCharacteristics;
+            }
+        }
 
         protected bool IsDarkRace
         {
@@ -80,7 +91,17 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             get
             {
                 var multiplier = _multiplier;
-                _buffList.ForEach(b => multiplier = b.DamageMulplier * multiplier);
+                _buffList.ForEach(b => multiplier = b.Characteristics.DamageMultiplier * multiplier);
+                return multiplier;
+            }
+        }
+
+        protected double HealMultiplier
+        {
+            get
+            {
+                var multiplier = _multiplier;
+                _buffList.ForEach(b => multiplier = b.Characteristics.HealMultiplier * multiplier);
                 return multiplier;
             }
         }
@@ -100,7 +121,6 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             Health = MaxHealth;
             _multiplier = 1;
             CanMove = true;
-            _buffList = new List<IBuff>();
         }
 
         protected Unit(Race unitRace, int unitIndex) : this(unitRace)
@@ -123,8 +143,13 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         public void DoRandomActionByType(IUnit unit, UnitActionType actionType)
         {
             RemoveUnActiveBuffs();
-            InvokeUnitAction(actionType, unit);
+            InvokeRandomUnitAction(actionType, unit);
             CanMove = false;
+        }
+
+        public double CountUnitAttackDamage(double damage)
+        {
+            return damage*DamageMultiplier;
         }
 
         #region Public State change Methods
@@ -137,36 +162,34 @@ namespace SmallRPGLibrary.Entities.Impl.Base
                 var hpLeftText = IsAlive
                                      ? string.Format("{0} HP left.", Health)
                                      : string.Format("Unit {0} is dead.", this);
-                GameLogger.Instance.Log(string.Format("{1} attacked {0} with {2}. Target unit loose {3} HP. {4}",
-                                                      this, attacker, attackName, damage, hpLeftText));
+                string message;
+                if (attacker != null)
+                {
+                    message = string.Format("{1} attacked {0} with {2}. Target unit loose {3} HP. {4}", this, attacker,
+                        attackName, damage, hpLeftText);
+                }
+                else
+                {
+                    message = string.Format("-- {0} unit loose {2} HP because of {1}. {3}", this, attackName, damage,
+                        hpLeftText);
+                }
+                GameLogger.Instance.Log(message);
             }
             else
             {
                 GameLogger.Instance.Log(
-                    string.Format("{0} can not be attacked by {1}, bacause he is already dead.", this, attacker),
-                    LogLevel.Warn);
+                    string.Format("-- {0} can not be attacked {1}, bacause he is already dead.", this,
+                        attacker != null ? "by " + attacker : ""), LogLevel.Warn);
             }
 
         }
 
-        public void LooseHealth(double damage, string attackName)
+        public void TakeDamage(double damage, string attackName)
         {
-            if (IsAlive)
-            {
-                Health -= damage;
-                var hpLeftText = IsAlive
-                                     ? string.Format("{0} HP left.", Health)
-                                     : string.Format("Unit {0} is dead.", this);
-                GameLogger.Instance.Log(string.Format("{0} unit loose {2} HP because of {1}. {3}",
-                                                      this, attackName, damage, hpLeftText));
-            }
-            else
-            {
-                GameLogger.Instance.Log(string.Format("{0} is already dead.", this), LogLevel.Warn);
-            }
+            TakeDamage(damage, null, attackName);
         }
 
-        public void Healing(double health, IUnitHealer healer, string healingName)
+        public void RestoreHealth(double health, IUnitHealer healer, string healingName)
         {
             if (IsAlive)
             {
@@ -189,8 +212,8 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             if (IsAlive)
             {
                 Health += health;
-                GameLogger.Instance.Log(string.Format("{0} unit loose {2} HP because of {1}. {3} HP left.",
-                                                      this, healingName, health, Health));
+                GameLogger.Instance.Log(string.Format("-- {0} unit restore {2} HP because of {1}. {3} HP left.",
+                                                      this, healingName, health, Health), LogLevel.Heal);
             }
             else
             {
@@ -266,7 +289,8 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             CanMove = true;
         }
 
-        private void InvokeUnitAction(UnitActionType actionType, IUnit unit)
+        private void InvokeRandomUnitAction(UnitActionType actionType, IUnit unit)
+
         {
             var methodInfos = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             var unitActionMethods = methodInfos.Where(m => m.GetCustomAttributes<UnitActionAttribute>().Any());
@@ -336,18 +360,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             return string.Format("'{0} {1}{2}'{3}{4}", UnitRace, ClassName, indexText, string.Join(" ", buffNames),
                                  leaderText);
         }
-
-        private void IterateBuffs()
-        {
-            _buffList.ForEach(b =>
-                {
-                    if (b.IsActive)
-                    {
-                        b.NextRound();
-                    }
-                });
-        }
-
+		
         private void RemoveUnActiveBuffs()
         {
             _buffList.ForEach(b =>
@@ -356,9 +369,12 @@ namespace SmallRPGLibrary.Entities.Impl.Base
                     {
                         b.FinishBuff();
                     }
+                    else
+                    {
+                        b.NextRound();
+                    }
                 });
             _buffList.RemoveAll(b => !b.IsActive);
-            IterateBuffs();
         }
 
         #endregion

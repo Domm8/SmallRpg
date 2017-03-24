@@ -11,7 +11,7 @@ namespace SmallRPGConsole
             Console.SetWindowSize(120, 35);
             var random = new Random();
             var firstRace = random.Next(0, 100) > 49 ? Race.Human : Race.Human;
-            var secondRace = random.Next(0, 100) > 49 ? Race.Orc : Race.Orc;
+            var secondRace = random.Next(0, 100) > 49 ? Race.Undead : Race.Undead;
             var firstGroup = new UnitGroup(firstRace);
             var secondGroup = new UnitGroup(secondRace);
 

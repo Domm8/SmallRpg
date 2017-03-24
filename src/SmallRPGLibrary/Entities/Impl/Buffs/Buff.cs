@@ -1,4 +1,5 @@
-﻿using SmallRPGLibrary.Entities.Interface;
+﻿using SmallRPGLibrary.Entities.Impl.UnitFeatures;
+using SmallRPGLibrary.Entities.Interface;
 
 namespace SmallRPGLibrary.Entities.Impl.Buffs
 {
@@ -7,13 +8,20 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
         #region Private Fields
 
         private bool _isFinished;
+        private int _lifeTime;
+        private BuffCharacteristics _characteristics;
 
         #endregion
 
         #region Protected
 
         protected IUnit BuffedUnit;
-        protected int LifeTime { get; set; }
+
+        protected int LifeTime
+        {
+            get { return _lifeTime; }
+            set { _lifeTime = value > -1 ? value : -1; }
+        }
 
         #endregion
 
@@ -21,7 +29,7 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
 
         public bool IsActive
         {
-            get { return LifeTime > 0; }
+            get { return LifeTime > 0 || LifeTime == -1; }
         }
 
         public virtual bool IsSingleAtUnit
@@ -35,6 +43,12 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
         }
 
         public string Name { get; private set; }
+
+        public virtual BuffCharacteristics Characteristics
+        {
+            get { return _characteristics ?? (_characteristics = new BuffCharacteristics()); }
+            protected set { _characteristics = value; }
+        }
 
         #endregion
 
@@ -70,7 +84,7 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
 
         public void Deactivate()
         {
-            LifeTime = -1;
+            LifeTime = 0;
         }
 
         public void FinishBuff()

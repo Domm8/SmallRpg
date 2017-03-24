@@ -4,13 +4,13 @@ using SmallRPGLibrary.Enums;
 
 namespace SmallRPGLibrary.Entities.Impl.UnitClasses
 {
-    public class Warrior: MeleeUnit
+    public class Paladin : MeleeUnit
     {
-        public Warrior(Race unitRace, int unitIndex) : base(unitRace, unitIndex)
+        public Paladin(Race unitRace, int unitIndex) : base(unitRace, unitIndex)
         {
-            if (unitRace != Race.Elf)
+            if (unitRace != Race.Human)
             {
-                throw new ArgumentException("Unit Race for class Warrior could be only Elf.");
+                throw new ArgumentException("Unit Race for class Paladin could be only Human.");
             }
         }
 
@@ -18,7 +18,7 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         {
             get
             {
-                return new AttackParameters("Mortal Strike", 16);
+                return new AttackParameters("Battle Hammer", 17);
             }
         }
     }

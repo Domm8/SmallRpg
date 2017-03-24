@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SmallRPGLibrary.Consts;
 using SmallRPGLibrary.Entities.Impl.Buffs;
@@ -16,7 +17,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         public UnitGroup(Race race)
         {
             Race = race;
-            _units = UnitFactoryBuilder.Create().GetGroupUnits(race);
+            _units = UnitFactoryCreator.Create().GetGroupUnits(race);
             _units.SelectLider();
         }
 
@@ -35,17 +36,23 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         public void StartOrderedFighting(UnitGroup unitGroup)
         {
             GameLogger.Instance.Log(string.Format("\nStart Fighting! {0} VS {1}!", this, unitGroup));
-
+            var i = 1;
             while (IsSomeBodyAlive() && unitGroup.IsSomeBodyAlive())
             {
+                Console.Write(i++);
                 FightOrHelp(GetNextFighter(), unitGroup, this);
+				
+                Console.Write(i++);
+				
                 FightOrHelp(unitGroup.GetNextFighter(), this, unitGroup);
 
                 if (unitGroup.IsRoundComplete() && IsRoundComplete())
                 {
-                    ToNextRound();
+                    i = 1;
+                    Console.ReadKey();
+                    this.ToNextRound();
                     unitGroup.ToNextRound();
-                    GameLogger.Instance.Log("Next Round!");
+                    GameLogger.Instance.Log("\nNext Round!\n");
                 }
             }
 
@@ -190,9 +197,9 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             var improvedUnits = aliveUnits.Where(u => u.IsBuffedBy<ImprovementBuff>()).ToList();
             if (improvedUnits.Count > 0)
             {
-                return improvedUnits.OrderByDescending(u => u.Characteristics.Speed).FirstOrDefault();
+                return improvedUnits.OrderByDescending(u => u.FullCharacteristics.Speed).FirstOrDefault();
             }
-            return aliveUnits.OrderByDescending(u => u.Characteristics.Speed).FirstOrDefault();
+            return aliveUnits.OrderByDescending(u => u.FullCharacteristics.Speed).FirstOrDefault();
         }
 
         private static void SelectWinner(UnitGroup firstGroup, UnitGroup secondGroup)

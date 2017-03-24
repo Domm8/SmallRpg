@@ -1,19 +1,18 @@
 ﻿using System;
 using SmallRPGLibrary.Attributes;
+using SmallRPGLibrary.Entities.Impl.Base;
+using SmallRPGLibrary.Entities.Impl.UnitFeatures;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 
 namespace SmallRPGLibrary.Entities.Impl.UnitClasses
 {
     [UnitAction(UnitActionType.Heal)]
-    public class Druid : Wisard, IUnitHealer
+    public class Druid : Wizard, IUnitHealer
     {
-        protected override double Damage
+        protected override AttackParameters MagicAttackParams
         {
-            get
-            {
-                return 10 * DamageMultiplier;
-            }
+            get { return new AttackParameters("Moon Fire", 10);  }
         }
 
         public Druid(Race unitRace, int unitIndex) : base(unitRace, unitIndex)
@@ -27,7 +26,7 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         [UnitAction(UnitActionType.Heal)]
         public void Heal(IUnit unit)
         {
-            unit.Healing(6 * DamageMultiplier, this, "Soul of the Forest");
+            unit.RestoreHealth(6 * DamageMultiplier, this, "Soul of the Forest");
         }
     }
 }
