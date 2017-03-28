@@ -7,6 +7,6 @@ namespace SmallRPGLibrary.Entities.Interface
         bool IsAlive { get; }
         bool IsHelpfull();
         bool IsHealer();
-        void DoRandomActionByType(IUnit unit, UnitActionType actionType);
+        void DoRandomActionByType(IUnit unit, UnitActionType actionType, bool sameActionTry = false);
     }
 }

@@ -14,7 +14,7 @@ namespace SmallRPGLibrary.Services.UnitBuilders
 
         protected override Unit GetRangeUnit(int index)
         {
-            return new UndeadBowman(Race.Undead, index);
+            return new SkeletBowman(Race.Undead, index);
         }
 
         protected override Unit GetWisardUnit(int index)

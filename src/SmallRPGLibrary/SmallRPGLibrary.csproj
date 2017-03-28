@@ -50,7 +50,7 @@
     <Compile Include="Entities\Impl\UnitClasses\Range\AxeThrower.cs" />
     <Compile Include="Entities\Impl\UnitClasses\Range\Hunter.cs" />
     <Compile Include="Entities\Impl\UnitClasses\Mage.cs" />
-    <Compile Include="Entities\Impl\UnitClasses\Range\UndeadBowman.cs" />
+    <Compile Include="Entities\Impl\UnitClasses\Range\SkeletBowman.cs" />
     <Compile Include="Entities\Impl\UnitClasses\Warrior.cs" />
     <Compile Include="Entities\Impl\UnitFeatures\AttackParameters.cs" />
     <Compile Include="Entities\Impl\UnitFeatures\Characteristics.cs" />
@@ -78,6 +78,7 @@
     <Compile Include="Enums\LogLevel.cs" />
     <Compile Include="Enums\Race.cs" />
     <Compile Include="Enums\UnitActionType.cs" />
+    <Compile Include="Exceptions\UnitActionNotAllowedException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\GameLogger.cs" />
     <Compile Include="Services\ExtensionHelper.cs" />

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using SmallRPGLibrary.Attributes;
 using SmallRPGLibrary.Entities.Impl.UnitFeatures;
+using SmallRPGLibrary.Exceptions;
 
 namespace SmallRPGLibrary.Entities.Impl.Base
 {
@@ -140,9 +141,12 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             return _buffList.Exists(buffType.IsInstanceOfType);
         }
 
-        public void DoRandomActionByType(IUnit unit, UnitActionType actionType)
+        public void DoRandomActionByType(IUnit unit, UnitActionType actionType, bool sameActionTry = false)
         {
-            RemoveUnActiveBuffs();
+            if (!sameActionTry)
+            {
+                RemoveUnActiveBuffs();
+            }
             InvokeRandomUnitAction(actionType, unit);
             CanMove = false;
         }
@@ -264,7 +268,8 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         {
             if (buff.IsSingleAtUnit && _buffList.Any(b => b.GetType() == buff.GetType()))
             {
-                return; // added for not buffing unit with the same buff twice
+                throw new UnitActionNotAllowedException("IBuff property IsSingleAtUnit is true! And Unit already hav such buff. BuffType: " + buff.GetType()); 
+                // added for not buffing unit with the same buff twice
             }
             buff.DoFirstBuffing();
             _buffList.Add(buff);
@@ -289,35 +294,54 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             CanMove = true;
         }
 
-        private void InvokeRandomUnitAction(UnitActionType actionType, IUnit unit)
+        #region Invoke Unit Actions
 
+        private void InvokeRandomUnitAction(UnitActionType actionType, IUnit unit)
+        {
+            var unitMethods = GetUnitActionDictionary(actionType);
+            if (unitMethods.Count == 0)
+            {
+                GameLogger.Instance.Log("Error occured unitMethods is empty!", LogLevel.Error);
+                throw new UnitActionNotAllowedException("unitMethods is empty");
+            }
+            var keys = unitMethods.Keys.ToList();
+            var keyIndex = new Random().Next(0, keys.Count);
+            var method = unitMethods[keys[keyIndex]];
+            InvokeAction(method, unit);
+        }
+
+        private Dictionary<string, MethodInfo> GetUnitActionDictionary(UnitActionType actionType)
         {
             var methodInfos = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             var unitActionMethods = methodInfos.Where(m => m.GetCustomAttributes<UnitActionAttribute>().Any());
             var unitMethods =
                 unitActionMethods.Where(
                     m => m.GetCustomAttribute<UnitActionAttribute>().UnitActionType.HasAnyFlag(actionType))
-                                 .ToDictionary(m => m.Name);
+                    .ToDictionary(m => m.Name);
+            return unitMethods;
+        }
+
+        private void InvokeAction(MethodInfo method, params object[] methodParameters)
+        {
             try
             {
-                if (unitMethods != null && unitMethods.Count > 0)
+                method.Invoke(this, methodParameters);
+            }
+            catch (TargetInvocationException exc)
+            {
+                if (exc.InnerException != null && exc.InnerException is UnitActionNotAllowedException)
                 {
-                    var keys = unitMethods.Keys.ToList();
-                    var keyIndex = new Random().Next(0, keys.Count);
-                    var method = unitMethods[keys[keyIndex]];
-                    method.Invoke(this, new object[] { unit });
-                }
-                else
-                {
-                    GameLogger.Instance.Log(string.Format("Error occured unitMethods is empty!"), LogLevel.Error);
+                    GameLogger.Instance.Log("UnitActionNotAllowedException exception was thrown!", LogLevel.Warn);
+                    throw exc.InnerException;
                 }
             }
             catch (Exception)
             {
-                GameLogger.Instance.Log(string.Format("Error occured while invocing one of unitMethods!"), LogLevel.Error);
+                GameLogger.Instance.Log("Error occured while invocing one of unitMethods!", LogLevel.Error);
             }
-
         }
+
+        #endregion
 
         #region ToString
 
@@ -354,7 +378,10 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         private string UnitToString()
         {
-            var buffNames = _buffList.Select(b => string.Format("({0})", b.Name)).ToArray();
+            var buffNames =
+                _buffList.GroupBy(b => b.Name)
+                    .Select(g => string.Format("({0}{1})", g.Key, g.Count() > 1 ? g.Count().ToString() : ""))
+                    .ToArray();
             var leaderText = _isLeader ? " (Leader)" : string.Empty;
             var indexText = UnitIndex != 0 ? " №" + UnitIndex : string.Empty;
             return string.Format("'{0} {1}{2}'{3}{4}", UnitRace, ClassName, indexText, string.Join(" ", buffNames),

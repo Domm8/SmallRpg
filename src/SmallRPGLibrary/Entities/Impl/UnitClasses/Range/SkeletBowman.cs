@@ -5,13 +5,13 @@ using SmallRPGLibrary.Enums;
 
 namespace SmallRPGLibrary.Entities.Impl.UnitClasses.Range
 {
-    public class UndeadBowman : RangeUnit
+    public class SkeletBowman : RangeUnit
     {
-        public UndeadBowman(Race unitRace, int unitIndex) : base(unitRace, unitIndex)
+        public SkeletBowman(Race unitRace, int unitIndex) : base(unitRace, unitIndex)
         {
             if (unitRace != Race.Undead)
             {
-                throw new ArgumentException("Unit Race for class UndeadBowman could be only Undead.");
+                throw new ArgumentException("Unit Race for class SkeletBowman could be only Undead.");
             }
         }
 
@@ -27,7 +27,7 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses.Range
 
         protected override string ClassName
         {
-            get { return "Undead Bowman"; }
+            get { return "Skelet Bowman"; }
         }
     }
 }

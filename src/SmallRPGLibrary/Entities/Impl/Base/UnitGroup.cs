@@ -5,6 +5,7 @@ using SmallRPGLibrary.Consts;
 using SmallRPGLibrary.Entities.Impl.Buffs;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
+using SmallRPGLibrary.Exceptions;
 using SmallRPGLibrary.Services;
 
 namespace SmallRPGLibrary.Entities.Impl.Base
@@ -127,32 +128,45 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         private static void FightOrHelp(IFighter fighter, UnitGroup opositeGroup, UnitGroup currentGroup)
         {
-            if (fighter == null)
+            if (fighter == null) { return; }
+            TryDoUnitAction(fighter, opositeGroup, currentGroup);
+        }
+
+        private static void TryDoUnitAction(IFighter fighter, UnitGroup opositeGroup, UnitGroup currentGroup, bool firstTry = false)
+        {
+            try
             {
-                return;
-            }
-            if (UnitAction.Random && fighter.IsHelpfull())
-            {
-                var target = currentGroup.GetNotImprovedTarget();
-                if (target != null)
+                if (!fighter.IsAlive)
                 {
-                    fighter.DoRandomActionByType(target, UnitActionType.HelpBuff);
                     return;
                 }
+                if (UnitAction.Random && fighter.IsHelpfull())
+                {
+                    var target = currentGroup.GetNotImprovedTarget();
+                    if (target != null)
+                    {
+                        fighter.DoRandomActionByType(target, UnitActionType.HelpBuff);
+                        return;
+                    }
+                }
+                if (UnitAction.Random)
+                {
+                    UnitActionType type;
+                    fighter.DoRandomActionByType(GetTarget(fighter, opositeGroup, out type), type);
+                }
+                else if (fighter.IsHealer() && currentGroup.IsNeedHeal())
+                {
+                    fighter.DoRandomActionByType(currentGroup.GetTargetWithLowerHealth(), UnitActionType.Heal);
+                }
+                else
+                {
+                    UnitActionType type;
+                    fighter.DoRandomActionByType(GetTarget(fighter, opositeGroup, out type), type);
+                }
             }
-            if (UnitAction.Random)
+            catch (UnitActionNotAllowedException)
             {
-                UnitActionType type;
-                fighter.DoRandomActionByType(GetTarget(fighter, opositeGroup, out type), type);
-            }
-            else if (fighter.IsHealer() && currentGroup.IsNeedHeal())
-            {
-                fighter.DoRandomActionByType(currentGroup.GetTargetWithLowerHealth(), UnitActionType.Heal);
-            }
-            else
-            {
-                UnitActionType type;
-                fighter.DoRandomActionByType(GetTarget(fighter, opositeGroup, out type), type);
+                TryDoUnitAction(fighter, opositeGroup, currentGroup, true);
             }
         }
 

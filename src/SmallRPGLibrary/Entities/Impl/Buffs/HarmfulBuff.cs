@@ -8,6 +8,11 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
         private readonly double _iterationDamage;
         private readonly IUnit _attacker;
 
+        public override bool IsSingleAtUnit
+        {
+            get { return false; }
+        }
+
         public HarmfulBuff(IUnit target, int lifetime, string name, IUnit attacker, double buffStartDamage, double iterationDamage)
             : base(target, lifetime, name)
         {
