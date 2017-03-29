@@ -15,6 +15,7 @@
             Speed = characteristics.Speed;
             Stamina = characteristics.Stamina;
             Strength = characteristics.Strength;
+            ReceivedHealthMultiplier = characteristics.ReceivedHealthMultiplier;
         }
         public double DamageMultiplier { get; set; }
         public double HealMultiplier { get; set; }

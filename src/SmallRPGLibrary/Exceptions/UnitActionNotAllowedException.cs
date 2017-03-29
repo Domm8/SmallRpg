@@ -1,8 +1,7 @@
-﻿using System;
-
+﻿
 namespace SmallRPGLibrary.Exceptions
 {
-    public class UnitActionNotAllowedException : Exception
+    public class UnitActionNotAllowedException : BusinessLogicException
     {
         public UnitActionNotAllowedException()
         {  

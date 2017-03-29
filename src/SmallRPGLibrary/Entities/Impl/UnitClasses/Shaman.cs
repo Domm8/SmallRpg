@@ -29,7 +29,7 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         [UnitAction(UnitActionType.Heal)]
         public void Heal(IUnit unit)
         {
-            unit.RestoreHealth(7 * DamageMultiplier, this, "High tide");
+            unit.RestoreHealth(7 * HealMultiplier, this, "High tide");
         }
 
         [UnitAction(UnitActionType.Curse)]

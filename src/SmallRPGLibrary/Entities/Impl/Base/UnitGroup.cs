@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using SmallRPGLibrary.Consts;
 using SmallRPGLibrary.Entities.Impl.Buffs;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
-using SmallRPGLibrary.Exceptions;
 using SmallRPGLibrary.Services;
 
 namespace SmallRPGLibrary.Entities.Impl.Base
@@ -22,47 +20,14 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             _units.SelectLider();
         }
 
-        public void StartRandomFighting(UnitGroup unitGroup)
-        {
-            GameLogger.Instance.Log(string.Format("\nStart Fighting! {0} VS {1}!", this, unitGroup));
-
-            while (IsSomeBodyAlive() && unitGroup.IsSomeBodyAlive())
-            {
-                FightOrHelp(GetRandomFighter(), unitGroup, this);
-                FightOrHelp(unitGroup.GetRandomFighter(), this, unitGroup);
-            }
-            SelectWinner(this, unitGroup);
-        }
-
-        public void StartOrderedFighting(UnitGroup unitGroup)
-        {
-            GameLogger.Instance.Log(string.Format("\nStart Fighting! {0} VS {1}!", this, unitGroup));
-            var i = 1;
-            while (IsSomeBodyAlive() && unitGroup.IsSomeBodyAlive())
-            {
-                Console.Write(i++);
-                FightOrHelp(GetNextFighter(), unitGroup, this);
-				
-                Console.Write(i++);
-				
-                FightOrHelp(unitGroup.GetNextFighter(), this, unitGroup);
-
-                if (unitGroup.IsRoundComplete() && IsRoundComplete())
-                {
-                    i = 1;
-                    Console.ReadKey();
-                    this.ToNextRound();
-                    unitGroup.ToNextRound();
-                    GameLogger.Instance.Log("\nNext Round!\n");
-                }
-            }
-
-            SelectWinner(this, unitGroup);
-        }
-
         public override string ToString()
         {
             return string.Format("Fighting group {0}", Race);
+        }
+
+        public List<IFighter> GetAliveFighters()
+        {
+            return new List<IFighter>(_units.Where(u => u.IsAlive));
         }
 
         public bool IsSomeBodyAlive()
@@ -85,7 +50,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             return GetAliveUnits().Any(u => u.Health < DefaultValues.UNIT_NEED_HEAL_HEALTH);
         }
 
-        public IUnit GetTarget()
+        public IUnit GetRandomTarget()
         {
             return GetAliveUnits().GetRandomUnit();
         }
@@ -126,75 +91,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             return null;
         }
 
-        private static void FightOrHelp(IFighter fighter, UnitGroup opositeGroup, UnitGroup currentGroup)
-        {
-            if (fighter == null) { return; }
-            TryDoUnitAction(fighter, opositeGroup, currentGroup);
-        }
-
-        private static void TryDoUnitAction(IFighter fighter, UnitGroup opositeGroup, UnitGroup currentGroup, bool firstTry = false)
-        {
-            try
-            {
-                if (!fighter.IsAlive)
-                {
-                    return;
-                }
-                if (UnitAction.Random && fighter.IsHelpfull())
-                {
-                    var target = currentGroup.GetNotImprovedTarget();
-                    if (target != null)
-                    {
-                        fighter.DoRandomActionByType(target, UnitActionType.HelpBuff);
-                        return;
-                    }
-                }
-                if (UnitAction.Random)
-                {
-                    UnitActionType type;
-                    fighter.DoRandomActionByType(GetTarget(fighter, opositeGroup, out type), type);
-                }
-                else if (fighter.IsHealer() && currentGroup.IsNeedHeal())
-                {
-                    fighter.DoRandomActionByType(currentGroup.GetTargetWithLowerHealth(), UnitActionType.Heal);
-                }
-                else
-                {
-                    UnitActionType type;
-                    fighter.DoRandomActionByType(GetTarget(fighter, opositeGroup, out type), type);
-                }
-            }
-            catch (UnitActionNotAllowedException)
-            {
-                TryDoUnitAction(fighter, opositeGroup, currentGroup, true);
-            }
-        }
-
-        private static IUnit GetTarget(IFighter attacker, UnitGroup opositeGroup, out UnitActionType type)
-        {
-            if (UnitAction.Random && attacker is ICurseCaster && opositeGroup.IsSomeBodyImproved())
-            {
-                var target = opositeGroup.GetImprovedTarget();
-                if (target != null)
-                {
-                    type = UnitActionType.Curse;
-                    return target;
-                }
-            }
-            if (UnitAction.Random && attacker is IDiseaseCaster)
-            {
-                var target = opositeGroup.GetNotDiseasedTarget();
-                if (target != null)
-                {
-                    type = UnitActionType.Disease;
-                    return target;
-                }
-            }
-            type = UnitActionType.Attack;
-            return opositeGroup.GetTarget();
-        }
-
-        private IFighter GetRandomFighter()
+        public IFighter GetRandomFighter()
         {
             var aliveUnits = GetAliveUnits();
             var improvedUnits = aliveUnits.Where(u => u.IsBuffedBy<ImprovementBuff>()).ToList();
@@ -214,13 +111,6 @@ namespace SmallRPGLibrary.Entities.Impl.Base
                 return improvedUnits.OrderByDescending(u => u.FullCharacteristics.Speed).FirstOrDefault();
             }
             return aliveUnits.OrderByDescending(u => u.FullCharacteristics.Speed).FirstOrDefault();
-        }
-
-        private static void SelectWinner(UnitGroup firstGroup, UnitGroup secondGroup)
-        {
-            var winner = firstGroup.IsSomeBodyAlive() ? firstGroup : secondGroup;
-            GameLogger.Instance.Log(string.Format("{0} is the winner!", winner));
-            GameLogger.Instance.Log(winner.GetAliveUnits().PrintUnits());
         }
 
         private List<Unit> GetAliveUnits()

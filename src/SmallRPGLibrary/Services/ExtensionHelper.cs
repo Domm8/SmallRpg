@@ -9,7 +9,7 @@ namespace SmallRPGLibrary.Services
 {
     public static class ExtensionHelper
     {
-        public static string PrintUnits(this IEnumerable<IUnit> list)
+        public static string PrintUnits(this IEnumerable<IFighter> list)
         {
             var textBuilder = new StringBuilder();
             var enumerator = list.GetEnumerator();

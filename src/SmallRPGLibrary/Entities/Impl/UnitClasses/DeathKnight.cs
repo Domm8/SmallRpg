@@ -1,6 +1,7 @@
 ﻿using System;
 using SmallRPGLibrary.Attributes;
 using SmallRPGLibrary.Entities.Impl.Buffs;
+using SmallRPGLibrary.Entities.Impl.BuffSettings;
 using SmallRPGLibrary.Entities.Impl.UnitFeatures;
 using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
@@ -33,7 +34,17 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         [UnitAction]
         public void Infection(IUnit target)
         {
-            target.AddBuff(new HarmfulBuff(target, 3, "Infection", this, 9, 4));
+            var settings = new HarmfulBuffSettings
+            {
+                Target = target,
+                BuffCaster = this,
+                Name = "Infection",
+                BuffStartDamage = 9,
+                IterationDamage = 4,
+                LifeTime = 3,
+                MaxCountPerUnit = 3
+            };
+            target.AddBuff(new HarmfulBuff(settings));
         }
     }
 }

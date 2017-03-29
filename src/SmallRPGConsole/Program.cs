@@ -1,6 +1,7 @@
 ﻿using System;
 using SmallRPGLibrary.Entities.Impl.Base;
 using SmallRPGLibrary.Enums;
+using SmallRPGLibrary.Services;
 
 namespace SmallRPGConsole
 {
@@ -14,15 +15,16 @@ namespace SmallRPGConsole
             var secondRace = random.Next(0, 100) > 49 ? Race.Undead : Race.Undead;
             var firstGroup = new UnitGroup(firstRace);
             var secondGroup = new UnitGroup(secondRace);
+            var autoFightService = new AutoFightService();
 
             var firstAttackFirst = random.Next(0, 100) > 49;
             if (firstAttackFirst)
             {
-                firstGroup.StartOrderedFighting(secondGroup);
+                autoFightService.StartOrderedFighting(firstGroup, secondGroup);
             }
             else
             {
-                secondGroup.StartOrderedFighting(firstGroup);
+                autoFightService.StartOrderedFighting(secondGroup, firstGroup);
             }
 
             Console.ReadKey();

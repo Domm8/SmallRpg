@@ -34,6 +34,16 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         private int UnitIndex { get; set; }
 
+        private Dictionary<string, int> BuffNameCountDictionary
+        {
+            get
+            {
+                return _buffList
+                            .GroupBy(b => b.Name)
+                            .ToDictionary(g => g.Key, g => g.Count());
+            }
+        }
+
         #endregion
 
         public bool IsLeader
@@ -163,21 +173,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             if (IsAlive)
             {
                 Health -= damage;
-                var hpLeftText = IsAlive
-                                     ? string.Format("{0} HP left.", Health)
-                                     : string.Format("Unit {0} is dead.", this);
-                string message;
-                if (attacker != null)
-                {
-                    message = string.Format("{1} attacked {0} with {2}. Target unit loose {3} HP. {4}", this, attacker,
-                        attackName, damage, hpLeftText);
-                }
-                else
-                {
-                    message = string.Format("-- {0} unit loose {2} HP because of {1}. {3}", this, attackName, damage,
-                        hpLeftText);
-                }
-                GameLogger.Instance.Log(message);
+                GameLogger.Instance.Log(GetTakeDamageMessage(damage, attacker, attackName));
             }
             else
             {
@@ -185,7 +181,6 @@ namespace SmallRPGLibrary.Entities.Impl.Base
                     string.Format("-- {0} can not be attacked {1}, bacause he is already dead.", this,
                         attacker != null ? "by " + attacker : ""), LogLevel.Warn);
             }
-
         }
 
         public void TakeDamage(double damage, string attackName)
@@ -197,32 +192,20 @@ namespace SmallRPGLibrary.Entities.Impl.Base
         {
             if (IsAlive)
             {
-                Health += health;
-
-                GameLogger.Instance.Log(
-                    string.Format("{0} healed by {1} with {2}. Target unit restored {3} HP. Current unit HP {4}",
-                                  this, healer, healingName, health, Health), LogLevel.Heal);
+                Health += FullCharacteristics.GetRecievedHealthWithMultipliers(health);
+                GameLogger.Instance.Log(GetRestoreHealthMessage(FullCharacteristics.GetRecievedHealthWithMultipliers(health), healer, healingName), LogLevel.Heal);
             }
             else
             {
                 GameLogger.Instance.Log(
-                    string.Format("{0} can not be healed by {1}, bacause he is already dead.", this, healer),
+                    string.Format("{0} can not be healed {1}, bacause he is already dead.", this, healer != null ? "by " + healer : ""),
                     LogLevel.Warn);
             }
         }
 
         public void RestoreHealth(double health, string healingName)
         {
-            if (IsAlive)
-            {
-                Health += health;
-                GameLogger.Instance.Log(string.Format("-- {0} unit restore {2} HP because of {1}. {3} HP left.",
-                                                      this, healingName, health, Health), LogLevel.Heal);
-            }
-            else
-            {
-                GameLogger.Instance.Log(string.Format("{0} is already dead.", this), LogLevel.Warn);
-            }
+            RestoreHealth(health, null, healingName);
         }
 
         public bool DeactivateBuff(Type buffType)
@@ -266,9 +249,13 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         public void AddBuff(IBuff buff)
         {
-            if (buff.IsSingleAtUnit && _buffList.Any(b => b.GetType() == buff.GetType()))
+            int buffCount;
+            if (BuffNameCountDictionary.TryGetValue(buff.Name, out buffCount) && buff.MaxCountPerUnit <= buffCount)
             {
-                throw new UnitActionNotAllowedException("IBuff property IsSingleAtUnit is true! And Unit already hav such buff. BuffType: " + buff.GetType()); 
+                throw new UnitActionNotAllowedException(
+                    string.Format(
+                        "Unit already have reached limit for such buff. BuffType: {0}, Name: {1}",
+                        buff.GetType(), buff.Name));
                 // added for not buffing unit with the same buff twice
             }
             buff.DoFirstBuffing();
@@ -301,8 +288,7 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             var unitMethods = GetUnitActionDictionary(actionType);
             if (unitMethods.Count == 0)
             {
-                GameLogger.Instance.Log("Error occured unitMethods is empty!", LogLevel.Error);
-                throw new UnitActionNotAllowedException("unitMethods is empty");
+                throw new EmptyUnitActionException("Unit Action Methods Dictionary is empty");
             }
             var keys = unitMethods.Keys.ToList();
             var keyIndex = new Random().Next(0, keys.Count);
@@ -329,9 +315,9 @@ namespace SmallRPGLibrary.Entities.Impl.Base
             }
             catch (TargetInvocationException exc)
             {
-                if (exc.InnerException != null && exc.InnerException is UnitActionNotAllowedException)
+                if (exc.InnerException != null && exc.InnerException is BusinessLogicException)
                 {
-                    GameLogger.Instance.Log("UnitActionNotAllowedException exception was thrown!", LogLevel.Warn);
+                    GameLogger.Instance.Log("BusinessLogicException exception was thrown!", LogLevel.Warn);
                     throw exc.InnerException;
                 }
             }
@@ -378,9 +364,8 @@ namespace SmallRPGLibrary.Entities.Impl.Base
 
         private string UnitToString()
         {
-            var buffNames =
-                _buffList.GroupBy(b => b.Name)
-                    .Select(g => string.Format("({0}{1})", g.Key, g.Count() > 1 ? g.Count().ToString() : ""))
+            var buffNames = BuffNameCountDictionary
+                    .Select(g => string.Format("({0}{1})", g.Key, g.Value > 1 ? g.Value.ToString() : ""))
                     .ToArray();
             var leaderText = _isLeader ? " (Leader)" : string.Empty;
             var indexText = UnitIndex != 0 ? " №" + UnitIndex : string.Empty;
@@ -402,6 +387,32 @@ namespace SmallRPGLibrary.Entities.Impl.Base
                     }
                 });
             _buffList.RemoveAll(b => !b.IsActive);
+        }
+
+        private string GetTakeDamageMessage(double damage, IUnit attacker, string attackName)
+        {
+            var hpLeftText = IsAlive
+                ? string.Format("{0} HP left.", Health)
+                : string.Format("Unit {0} is dead.", this);
+
+            if (attacker != null)
+            {
+                return string.Format("{1} attacked {0} with {2}. Target unit loose {3} HP. {4}", this, attacker,
+                    attackName, damage, hpLeftText);
+            }
+            return string.Format("-- {0} unit loose {2} HP because of {1}. {3}", this, attackName, damage,
+                hpLeftText);
+        }
+
+        private string GetRestoreHealthMessage(double health, IUnitHealer healer, string healingName)
+        {
+            if (healer != null)
+            {
+                return string.Format("{0} healed by {1} with {2}. Target unit restored {3} HP. Current unit HP {4}",
+                    this, healer, healingName, health, Health);
+            }
+            return string.Format("-- {0} unit restore {2} HP because of {1}. {3} HP left.",
+                this, healingName, health, Health);
         }
 
         #endregion

@@ -26,7 +26,7 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         [UnitAction(UnitActionType.Heal)]
         public void Heal(IUnit unit)
         {
-            unit.RestoreHealth(6 * DamageMultiplier, this, "Soul of the Forest");
+            unit.RestoreHealth(6 * HealMultiplier, this, "Soul of the Forest");
         }
     }
 }

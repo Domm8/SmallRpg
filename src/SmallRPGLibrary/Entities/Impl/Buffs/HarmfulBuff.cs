@@ -1,4 +1,4 @@
-﻿using SmallRPGLibrary.Entities.Interface;
+﻿using SmallRPGLibrary.Entities.Impl.BuffSettings;
 
 namespace SmallRPGLibrary.Entities.Impl.Buffs
 {
@@ -6,26 +6,19 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
     {
         private readonly double _buffStartDamage;
         private readonly double _iterationDamage;
-        private readonly IUnit _attacker;
 
-        public override bool IsSingleAtUnit
+        public HarmfulBuff(HarmfulBuffSettings settings)
+            : base(settings)
         {
-            get { return false; }
-        }
-
-        public HarmfulBuff(IUnit target, int lifetime, string name, IUnit attacker, double buffStartDamage, double iterationDamage)
-            : base(target, lifetime, name)
-        {
-            _attacker = attacker;
-            _iterationDamage = attacker.CountUnitAttackDamage(iterationDamage);
-            _buffStartDamage = attacker.CountUnitAttackDamage(buffStartDamage);
+            _iterationDamage = BuffCaster.CountUnitAttackDamage(settings.IterationDamage);
+            _buffStartDamage = BuffCaster.CountUnitAttackDamage(settings.BuffStartDamage);
         }
 
         protected override void Action()
         {
             if (_buffStartDamage > 0)
             {
-                BuffedUnit.TakeDamage(_buffStartDamage,_attacker, Name);
+                BuffedUnit.TakeDamage(_buffStartDamage, BuffCaster, Name);
             }
         }
 

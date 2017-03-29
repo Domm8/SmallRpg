@@ -4,6 +4,7 @@ using SmallRPGLibrary.Entities.Interface;
 using SmallRPGLibrary.Enums;
 using System;
 using SmallRPGLibrary.Attributes;
+using SmallRPGLibrary.Entities.Impl.BuffSettings;
 using SmallRPGLibrary.Entities.Impl.UnitFeatures;
 
 namespace SmallRPGLibrary.Entities.Impl.UnitClasses
@@ -42,7 +43,12 @@ namespace SmallRPGLibrary.Entities.Impl.UnitClasses
         [UnitAction(UnitActionType.Disease)]
         public void CastDisease(IUnit unit)
         {
-            unit.AddBuff(new DiseaseBuff(unit, this));
+            var buffSettings = new TargetBuffSettings
+            {
+                BuffCaster = this,
+                Target = unit,
+            };
+            unit.AddBuff(new DiseaseBuff(buffSettings));
         }
 
         [UnitAction(UnitActionType.Attack)]

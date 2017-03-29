@@ -9,13 +9,15 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
 
         private bool _isFinished;
         private int _lifeTime;
+        private int _maxCountPerUnit = 1;
         private BuffCharacteristics _characteristics;
 
         #endregion
 
         #region Protected
 
-        protected IUnit BuffedUnit;
+        protected IUnit BuffedUnit { get; set; }
+        protected IUnit BuffCaster { get; set; }
 
         protected int LifeTime
         {
@@ -32,9 +34,10 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
             get { return LifeTime > 0 || LifeTime == -1; }
         }
 
-        public virtual bool IsSingleAtUnit
+        public int MaxCountPerUnit
         {
-            get { return true; }
+            get { return _maxCountPerUnit; }
+            protected set { _maxCountPerUnit = value <= 0 ? 1 : value; }
         }
 
         public virtual double DamageMulplier
@@ -54,11 +57,26 @@ namespace SmallRPGLibrary.Entities.Impl.Buffs
 
         #region .ctor
 
-        protected Buff(IUnit target, int lifetime, string name)
+        protected Buff(BuffSettings.BuffSettings settings)
+        {
+            BuffedUnit = settings.Target;
+            LifeTime = settings.LifeTime;
+            Name = settings.Name;
+            MaxCountPerUnit = settings.MaxCountPerUnit;
+            BuffCaster = settings.BuffCaster;
+        }
+
+        protected Buff(IUnit target, int lifeTime, string name)
         {
             BuffedUnit = target;
-            LifeTime = lifetime;
+            LifeTime = lifeTime;
             Name = name;
+        }
+
+        protected Buff(IUnit target, int lifeTime, string name, int maxCountPerUnit) 
+            : this(target, lifeTime, name)
+        {
+            MaxCountPerUnit = maxCountPerUnit;
         }
 
         #endregion

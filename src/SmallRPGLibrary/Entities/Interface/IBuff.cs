@@ -5,7 +5,7 @@ namespace SmallRPGLibrary.Entities.Interface
     public interface IBuff
     {
         bool IsActive { get; }
-        bool IsSingleAtUnit { get; }
+        int MaxCountPerUnit { get; }
         string Name { get; }
         BuffCharacteristics Characteristics { get; }
 
